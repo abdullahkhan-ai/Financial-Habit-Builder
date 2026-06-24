@@ -4,11 +4,15 @@ const connectDB = require("./config/db");
 
 dotenv.config();
 
-console.log(process.env.MONGO_URI);
-
 connectDB();
 
 const app = express();
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
 
 app.get("/", (req, res) => {
   res.send("Financial Habit Builder Backend Running 🚀");
