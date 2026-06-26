@@ -53,7 +53,43 @@ const registerUser = async (req, res) => {
     });
   }
 };
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
+    // Check empty fields
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Please fill all fields",
+      });
+    }
+
+    // Find user
+    const user = await User.findOne({ email });
+
+    // Check email and password
+    if (
+      user &&
+      (await bcrypt.compare(password, user.password))
+    ) {
+      return res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    }
+
+    return res.status(401).json({
+      message: "Invalid email or password",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   registerUser,
+  loginUser,
 };
