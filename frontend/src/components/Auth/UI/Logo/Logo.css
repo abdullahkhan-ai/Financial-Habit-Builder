@@ -1,0 +1,39 @@
+.logo{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.logo-icon{
+    width:56px;
+    height:56px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    box-shadow:0 10px 30px rgba(37,99,235,.25);
+}
+
+.logo-text h2{
+    font-size:22px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.logo-text p{
+    font-size:14px;
+    color:#64748b;
+}
+
+.logo-small .logo-icon{
+    width:42px;
+    height:42px;
+    font-size:18px;
+}
+
+.logo-small .logo-text h2{
+    font-size:18px;
+}
