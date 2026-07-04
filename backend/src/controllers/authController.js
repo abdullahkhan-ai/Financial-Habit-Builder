@@ -54,8 +54,11 @@ const registerUser = async (req, res) => {
   }
 };
 const loginUser = async (req, res) => {
+  console.log("========== LOGIN CONTROLLER ==========");
   try {
     const { email, password } = req.body;
+    console.log("Email:", email);
+console.log("Password:", password);
     console.log("Login request received:", email);
 
     // Check empty fields
@@ -67,6 +70,9 @@ const loginUser = async (req, res) => {
 
     // Find user
     const user = await User.findOne({ email });
+    
+    console.log("Email received:", email);
+console.log("User found:", user);
 
     // Check email and password
     if (
