@@ -1,0 +1,170 @@
+import { useEffect, useState } from "react";
+import DashboardLayout from "../components/layout/DashboardLayout";
+import TransactionTable from "../components/table/TransactionTable";
+import ExpenseModal from "../components/ui/ExpenseModal";
+
+import {
+  getExpense,
+  createExpense,
+  updateExpense,
+  deleteExpense,
+} from "../services/expenseService";
+
+import toast from "react-hot-toast";
+
+function Expenses() {
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const data = await getExpense();
+      setExpenses(data);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch expenses."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async (formData) => {
+    try {
+      await createExpense(formData);
+
+      toast.success("Expense added successfully.");
+
+      setShowModal(false);
+
+      fetchExpenses();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add expense."
+      );
+    }
+  };
+
+  const handleUpdate = async (formData) => {
+    try {
+      await updateExpense(
+        selectedExpense._id,
+        formData
+      );
+
+      toast.success("Expense updated successfully.");
+
+      setSelectedExpense(null);
+      setShowModal(false);
+
+      fetchExpenses();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update expense."
+      );
+    }
+  };
+
+  const handleDelete = async (expense) => {
+    const confirmDelete = window.confirm(
+      "Delete this expense?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteExpense(expense._id);
+
+      toast.success("Expense deleted.");
+
+      fetchExpenses();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to delete expense."
+      );
+    }
+  };
+
+  return (
+    <DashboardLayout>
+
+      <div className="mb-8 flex items-center justify-between">
+
+        <div>
+
+          <h1 className="text-3xl font-bold text-slate-900">
+            Expenses
+          </h1>
+
+          <p className="mt-2 text-slate-500">
+            Manage all your expenses.
+          </p>
+
+        </div>
+
+        <button
+          onClick={() => {
+            setSelectedExpense(null);
+            setShowModal(true);
+          }}
+          className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+        >
+          + Add Expense
+        </button>
+
+      </div>
+
+      {loading ? (
+
+        <div className="rounded-3xl bg-white p-10 text-center">
+          Loading...
+        </div>
+
+      ) : (
+
+        <TransactionTable
+          data={expenses}
+          titleField="title"
+          emptyMessage="No expenses found."
+          onEdit={(expense) => {
+            setSelectedExpense(expense);
+            setShowModal(true);
+          }}
+          onDelete={handleDelete}
+        />
+
+      )}
+
+      {showModal && (
+
+        <ExpenseModal
+          initialData={selectedExpense}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedExpense(null);
+          }}
+          onSave={
+            selectedExpense
+              ? handleUpdate
+              : handleCreate
+          }
+        />
+
+      )}
+
+    </DashboardLayout>
+  );
+}
+
+export default Expenses;

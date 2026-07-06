@@ -17,6 +17,9 @@ const startServer = async () => {
 
     // Routes
     app.use("/api/auth", require("./routes/authRoutes"));
+    app.use("/api/income", require("./routes/incomeRoutes"));
+    app.use("/api/expense", require("./routes/expenseRoutes"));
+    app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
     app.get("/", (req, res) => {
       res.send("Financial Habit Builder Backend Running 🚀");
