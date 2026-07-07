@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import TransactionTable from "../components/table/TransactionTable";
 import ExpenseModal from "../components/ui/ExpenseModal";
+import ExportButtons from "../components/ui/ExportButtons";
+
+import {
+  exportToPDF,
+  exportToCSV,
+} from "../utils/exportUtils";
 
 import {
   getExpense,
@@ -76,11 +82,7 @@ function Expenses() {
   };
 
   const handleDelete = async (expense) => {
-    const confirmDelete = window.confirm(
-      "Delete this expense?"
-    );
-
-    if (!confirmDelete) return;
+    if (!window.confirm("Delete this expense?")) return;
 
     try {
       await deleteExpense(expense._id);
@@ -94,6 +96,37 @@ function Expenses() {
           "Failed to delete expense."
       );
     }
+  };
+
+  // Export PDF
+
+  const handleExportPDF = () => {
+    const columns = [
+      "Title",
+      "Category",
+      "Amount",
+      "Date",
+    ];
+
+    const rows = expenses.map((item) => [
+      item.title,
+      item.category,
+      `₹${item.amount}`,
+      new Date(item.date).toLocaleDateString(),
+    ]);
+
+    exportToPDF(
+      "Expense Report",
+      columns,
+      rows,
+      "expense-report"
+    );
+  };
+
+  // Export Excel
+
+  const handleExportCSV = () => {
+    exportToCSV(expenses, "expense-report");
   };
 
   return (
@@ -113,15 +146,24 @@ function Expenses() {
 
         </div>
 
-        <button
-          onClick={() => {
-            setSelectedExpense(null);
-            setShowModal(true);
-          }}
-          className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-        >
-          + Add Expense
-        </button>
+        <div className="flex gap-3">
+
+          <ExportButtons
+            onPDF={handleExportPDF}
+            onCSV={handleExportCSV}
+          />
+
+          <button
+            onClick={() => {
+              setSelectedExpense(null);
+              setShowModal(true);
+            }}
+            className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+          >
+            + Add Expense
+          </button>
+
+        </div>
 
       </div>
 

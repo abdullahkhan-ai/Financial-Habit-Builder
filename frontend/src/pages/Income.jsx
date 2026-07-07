@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import IncomeModal from "../components/ui/IncomeModal";
+import ExportButtons from "../components/ui/ExportButtons";
+import {
+  exportToPDF,
+  exportToCSV,
+} from "../utils/exportUtils";
 import {
   getIncome,
   createIncome,
@@ -15,7 +20,8 @@ function Income() {
   const [loading, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
-  const [selectedIncome, setSelectedIncome] = useState(null);
+  const [selectedIncome, setSelectedIncome] =
+    useState(null);
 
   useEffect(() => {
     fetchIncome();
@@ -54,7 +60,10 @@ function Income() {
 
   const handleUpdateIncome = async (formData) => {
     try {
-      await updateIncome(selectedIncome._id, formData);
+      await updateIncome(
+        selectedIncome._id,
+        formData
+      );
 
       toast.success("Income updated successfully");
 
@@ -71,11 +80,12 @@ function Income() {
   };
 
   const handleDeleteIncome = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this income?"
-    );
-
-    if (!confirmDelete) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this income?"
+      )
+    )
+      return;
 
     try {
       await deleteIncome(id);
@@ -101,11 +111,44 @@ function Income() {
     setShowModal(true);
   };
 
+  // Export PDF
+
+  const handleExportPDF = () => {
+    const columns = [
+      "Source",
+      "Category",
+      "Amount",
+      "Date",
+    ];
+
+    const rows = income.map((item) => [
+      item.source,
+      item.category,
+      `₹${item.amount}`,
+      new Date(item.date).toLocaleDateString(),
+    ]);
+
+    exportToPDF(
+      "Income Report",
+      columns,
+      rows,
+      "income-report"
+    );
+  };
+
+  // Export Excel
+
+  const handleExportCSV = () => {
+    exportToCSV(income, "income-report");
+  };
+
   return (
     <DashboardLayout>
+
       <div className="mb-8 flex items-center justify-between">
 
         <div>
+
           <h1 className="text-3xl font-bold text-slate-900">
             Income
           </h1>
@@ -113,14 +156,24 @@ function Income() {
           <p className="mt-2 text-slate-500">
             Manage all your income sources.
           </p>
+
         </div>
 
-        <button
-          onClick={openAddModal}
-          className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-        >
-          + Add Income
-        </button>
+        <div className="flex gap-3">
+
+          <ExportButtons
+            onPDF={handleExportPDF}
+            onCSV={handleExportCSV}
+          />
+
+          <button
+            onClick={openAddModal}
+            className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+          >
+            + Add Income
+          </button>
+
+        </div>
 
       </div>
 
@@ -139,11 +192,25 @@ function Income() {
 
               <tr className="border-b">
 
-                <th className="py-3 text-left">Source</th>
-                <th className="py-3 text-left">Category</th>
-                <th className="py-3 text-left">Amount</th>
-                <th className="py-3 text-left">Date</th>
-                <th className="py-3 text-center">Actions</th>
+                <th className="py-3 text-left">
+                  Source
+                </th>
+
+                <th className="py-3 text-left">
+                  Category
+                </th>
+
+                <th className="py-3 text-left">
+                  Amount
+                </th>
+
+                <th className="py-3 text-left">
+                  Date
+                </th>
+
+                <th className="py-3 text-center">
+                  Actions
+                </th>
 
               </tr>
 
@@ -162,16 +229,19 @@ function Income() {
                     {item.source}
                   </td>
 
+                  <td>{item.category}</td>
+
                   <td>
-                    {item.category}
+                    ₹
+                    {item.amount.toLocaleString(
+                      "en-IN"
+                    )}
                   </td>
 
                   <td>
-                    ₹{item.amount.toLocaleString()}
-                  </td>
-
-                  <td>
-                    {new Date(item.date).toLocaleDateString()}
+                    {new Date(
+                      item.date
+                    ).toLocaleDateString()}
                   </td>
 
                   <td>
@@ -179,7 +249,9 @@ function Income() {
                     <div className="flex justify-center gap-3">
 
                       <button
-                        onClick={() => openEditModal(item)}
+                        onClick={() =>
+                          openEditModal(item)
+                        }
                         className="rounded-lg p-2 text-blue-600 hover:bg-blue-50"
                       >
                         <Pencil size={18} />
@@ -187,7 +259,9 @@ function Income() {
 
                       <button
                         onClick={() =>
-                          handleDeleteIncome(item._id)
+                          handleDeleteIncome(
+                            item._id
+                          )
                         }
                         className="rounded-lg p-2 text-red-600 hover:bg-red-50"
                       >

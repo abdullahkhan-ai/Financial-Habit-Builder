@@ -11,15 +11,17 @@ const startServer = async () => {
 
     const app = express();
 
-    // Middleware
     app.use(cors());
     app.use(express.json());
 
-    // Routes
     app.use("/api/auth", require("./routes/authRoutes"));
     app.use("/api/income", require("./routes/incomeRoutes"));
     app.use("/api/expense", require("./routes/expenseRoutes"));
     app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+    app.use("/api/goals", require("./routes/goalRoutes"));
+    app.use("/api/analytics", require("./routes/analyticsRoutes"));
+    app.use("/api/habits", require("./routes/habitRoutes"));
+    app.use("/api/admin", require("./routes/adminRoutes"));
 
     app.get("/", (req, res) => {
       res.send("Financial Habit Builder Backend Running 🚀");

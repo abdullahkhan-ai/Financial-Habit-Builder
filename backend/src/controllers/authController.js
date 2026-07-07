@@ -3,25 +3,23 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const generateToken = require("../utils/generateToken");
 
+// Register User
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check empty fields
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Please fill all fields",
       });
     }
 
-    // Validate email
     if (!validator.isEmail(email)) {
       return res.status(400).json({
         message: "Invalid email",
       });
     }
 
-    // Check existing user
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -30,11 +28,12 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(
+      password,
+      salt
+    );
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -45,6 +44,7 @@ const registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -53,28 +53,20 @@ const registerUser = async (req, res) => {
     });
   }
 };
+
+// Login User
 const loginUser = async (req, res) => {
-  console.log("========== LOGIN CONTROLLER ==========");
   try {
     const { email, password } = req.body;
-    console.log("Email:", email);
-console.log("Password:", password);
-    console.log("Login request received:", email);
 
-    // Check empty fields
     if (!email || !password) {
       return res.status(400).json({
         message: "Please fill all fields",
       });
     }
 
-    // Find user
     const user = await User.findOne({ email });
-    
-    console.log("Email received:", email);
-console.log("User found:", user);
 
-    // Check email and password
     if (
       user &&
       (await bcrypt.compare(password, user.password))
@@ -83,6 +75,7 @@ console.log("User found:", user);
         _id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
         token: generateToken(user._id),
       });
     }
@@ -96,6 +89,7 @@ console.log("User found:", user);
     });
   }
 };
+
 module.exports = {
   registerUser,
   loginUser,

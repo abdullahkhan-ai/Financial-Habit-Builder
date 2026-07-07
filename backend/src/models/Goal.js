@@ -17,7 +17,7 @@ const goalSchema = new mongoose.Schema(
     targetAmount: {
       type: Number,
       required: true,
-      min: 0,
+      min: 1,
     },
 
     savedAmount: {
@@ -28,16 +28,49 @@ const goalSchema = new mongoose.Schema(
 
     targetDate: {
       type: Date,
+      required: true,
     },
 
-    completed: {
-      type: Boolean,
-      default: false,
+    category: {
+      type: String,
+      enum: [
+        "Emergency Fund",
+        "Travel",
+        "Vehicle",
+        "Electronics",
+        "Education",
+        "Home",
+        "Investment",
+        "Business",
+        "Other",
+      ],
+      default: "Other",
+    },
+
+    notes: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["Active", "Completed"],
+      default: "Active",
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Automatically update goal status
+goalSchema.pre("save", function () {
+  if (this.savedAmount >= this.targetAmount) {
+    this.status = "Completed";
+  } else {
+    this.status = "Active";
+  }
+});
 
 module.exports = mongoose.model("Goal", goalSchema);
