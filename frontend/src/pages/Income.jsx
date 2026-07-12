@@ -1,26 +1,39 @@
 import { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
 import IncomeModal from "../components/ui/IncomeModal";
 import ExportButtons from "../components/ui/ExportButtons";
+import ConfirmModal from "../components/ui/ConfirmModal";
+
 import {
   exportToPDF,
   exportToCSV,
 } from "../utils/exportUtils";
+
 import {
   getIncome,
   createIncome,
   updateIncome,
   deleteIncome,
 } from "../services/incomeService";
+
 import toast from "react-hot-toast";
 
 function Income() {
   const [income, setIncome] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] =
+    useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] =
+    useState(false);
+
   const [selectedIncome, setSelectedIncome] =
+    useState(null);
+
+  const [deleteId, setDeleteId] =
     useState(null);
 
   useEffect(() => {
@@ -30,6 +43,7 @@ function Income() {
   const fetchIncome = async () => {
     try {
       const data = await getIncome();
+
       setIncome(data);
     } catch (error) {
       toast.error(
@@ -41,11 +55,15 @@ function Income() {
     }
   };
 
-  const handleCreateIncome = async (formData) => {
+  const handleCreateIncome = async (
+    formData
+  ) => {
     try {
       await createIncome(formData);
 
-      toast.success("Income added successfully");
+      toast.success(
+        "Income added successfully"
+      );
 
       setShowModal(false);
 
@@ -58,16 +76,21 @@ function Income() {
     }
   };
 
-  const handleUpdateIncome = async (formData) => {
+  const handleUpdateIncome = async (
+    formData
+  ) => {
     try {
       await updateIncome(
         selectedIncome._id,
         formData
       );
 
-      toast.success("Income updated successfully");
+      toast.success(
+        "Income updated successfully"
+      );
 
       setSelectedIncome(null);
+
       setShowModal(false);
 
       fetchIncome();
@@ -79,18 +102,25 @@ function Income() {
     }
   };
 
-  const handleDeleteIncome = async (id) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this income?"
-      )
-    )
-      return;
+  // Delete Modal
 
+  const openDeleteModal = (id) => {
+    setDeleteId(id);
+
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteIncome = async () => {
     try {
-      await deleteIncome(id);
+      await deleteIncome(deleteId);
 
-      toast.success("Income deleted successfully");
+      toast.success(
+        "Income deleted successfully"
+      );
+
+      setDeleteId(null);
+
+      setShowDeleteModal(false);
 
       fetchIncome();
     } catch (error) {
@@ -103,11 +133,13 @@ function Income() {
 
   const openAddModal = () => {
     setSelectedIncome(null);
+
     setShowModal(true);
   };
 
   const openEditModal = (item) => {
     setSelectedIncome(item);
+
     setShowModal(true);
   };
 
@@ -125,7 +157,9 @@ function Income() {
       item.source,
       item.category,
       `₹${item.amount}`,
-      new Date(item.date).toLocaleDateString(),
+      new Date(
+        item.date
+      ).toLocaleDateString(),
     ]);
 
     exportToPDF(
@@ -139,10 +173,12 @@ function Income() {
   // Export Excel
 
   const handleExportCSV = () => {
-    exportToCSV(income, "income-report");
+    exportToCSV(
+      income,
+      "income-report"
+    );
   };
-
-  return (
+    return (
     <DashboardLayout>
 
       <div className="mb-8 flex items-center justify-between">
@@ -168,7 +204,7 @@ function Income() {
 
           <button
             onClick={openAddModal}
-            className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+            className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
           >
             + Add Income
           </button>
@@ -180,12 +216,17 @@ function Income() {
       <div className="rounded-3xl bg-white p-6 shadow">
 
         {loading ? (
+
           <p>Loading...</p>
+
         ) : income.length === 0 ? (
+
           <p className="text-slate-500">
             No income records found.
           </p>
+
         ) : (
+
           <table className="w-full">
 
             <thead>
@@ -229,7 +270,9 @@ function Income() {
                     {item.source}
                   </td>
 
-                  <td>{item.category}</td>
+                  <td>
+                    {item.category}
+                  </td>
 
                   <td>
                     ₹
@@ -252,18 +295,18 @@ function Income() {
                         onClick={() =>
                           openEditModal(item)
                         }
-                        className="rounded-lg p-2 text-blue-600 hover:bg-blue-50"
+                        className="rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
                       >
                         <Pencil size={18} />
                       </button>
 
                       <button
                         onClick={() =>
-                          handleDeleteIncome(
+                          openDeleteModal(
                             item._id
                           )
                         }
-                        className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+                        className="rounded-lg p-2 text-red-600 transition hover:bg-red-50"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -279,11 +322,13 @@ function Income() {
             </tbody>
 
           </table>
+
         )}
 
       </div>
 
       {showModal && (
+
         <IncomeModal
           initialData={selectedIncome}
           onClose={() => {
@@ -296,7 +341,22 @@ function Income() {
               : handleCreateIncome
           }
         />
+
       )}
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Income"
+        message="Are you sure you want to delete this income record? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger={true}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteId(null);
+        }}
+        onConfirm={handleDeleteIncome}
+      />
 
     </DashboardLayout>
   );

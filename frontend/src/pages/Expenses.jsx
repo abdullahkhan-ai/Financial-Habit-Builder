@@ -3,6 +3,7 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 import TransactionTable from "../components/table/TransactionTable";
 import ExpenseModal from "../components/ui/ExpenseModal";
 import ExportButtons from "../components/ui/ExportButtons";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 import {
   exportToPDF,
@@ -22,8 +23,17 @@ function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [showModal, setShowModal] =
+    useState(false);
+
+  const [selectedExpense, setSelectedExpense] =
+    useState(null);
+
+  const [showDeleteModal, setShowDeleteModal] =
+    useState(false);
+
+  const [deleteExpenseId, setDeleteExpenseId] =
+    useState(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -32,6 +42,7 @@ function Expenses() {
   const fetchExpenses = async () => {
     try {
       const data = await getExpense();
+
       setExpenses(data);
     } catch (error) {
       toast.error(
@@ -47,7 +58,9 @@ function Expenses() {
     try {
       await createExpense(formData);
 
-      toast.success("Expense added successfully.");
+      toast.success(
+        "Expense added successfully."
+      );
 
       setShowModal(false);
 
@@ -67,9 +80,12 @@ function Expenses() {
         formData
       );
 
-      toast.success("Expense updated successfully.");
+      toast.success(
+        "Expense updated successfully."
+      );
 
       setSelectedExpense(null);
+
       setShowModal(false);
 
       fetchExpenses();
@@ -81,13 +97,23 @@ function Expenses() {
     }
   };
 
-  const handleDelete = async (expense) => {
-    if (!window.confirm("Delete this expense?")) return;
+  // Delete
 
+  const openDeleteModal = (expense) => {
+    setDeleteExpenseId(expense._id);
+
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
     try {
-      await deleteExpense(expense._id);
+      await deleteExpense(deleteExpenseId);
 
       toast.success("Expense deleted.");
+
+      setShowDeleteModal(false);
+
+      setDeleteExpenseId(null);
 
       fetchExpenses();
     } catch (error) {
@@ -112,7 +138,9 @@ function Expenses() {
       item.title,
       item.category,
       `₹${item.amount}`,
-      new Date(item.date).toLocaleDateString(),
+      new Date(
+        item.date
+      ).toLocaleDateString(),
     ]);
 
     exportToPDF(
@@ -126,10 +154,12 @@ function Expenses() {
   // Export Excel
 
   const handleExportCSV = () => {
-    exportToCSV(expenses, "expense-report");
+    exportToCSV(
+      expenses,
+      "expense-report"
+    );
   };
-
-  return (
+    return (
     <DashboardLayout>
 
       <div className="mb-8 flex items-center justify-between">
@@ -183,7 +213,7 @@ function Expenses() {
             setSelectedExpense(expense);
             setShowModal(true);
           }}
-          onDelete={handleDelete}
+          onDelete={openDeleteModal}
         />
 
       )}
@@ -204,6 +234,20 @@ function Expenses() {
         />
 
       )}
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger={true}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteExpenseId(null);
+        }}
+        onConfirm={handleDelete}
+      />
 
     </DashboardLayout>
   );

@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import HabitCard from "../components/ui/HabitCard";
 import HabitModal from "../components/ui/HabitModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 import {
   getHabits,
@@ -17,8 +18,16 @@ function Habits() {
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] =
+    useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] =
+    useState(false);
+
   const [selectedHabit, setSelectedHabit] =
+    useState(null);
+
+  const [deleteHabitId, setDeleteHabitId] =
     useState(null);
 
   useEffect(() => {
@@ -28,6 +37,7 @@ function Habits() {
   const fetchHabits = async () => {
     try {
       const data = await getHabits();
+
       setHabits(data);
     } catch (error) {
       toast.error(
@@ -66,6 +76,7 @@ function Habits() {
       toast.success("Habit updated.");
 
       setSelectedHabit(null);
+
       setShowModal(false);
 
       fetchHabits();
@@ -77,14 +88,23 @@ function Habits() {
     }
   };
 
-  const handleDelete = async (habit) => {
-    if (!window.confirm("Delete this habit?"))
-      return;
+  // Delete
 
+  const openDeleteModal = (habit) => {
+    setDeleteHabitId(habit._id);
+
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
     try {
-      await deleteHabit(habit._id);
+      await deleteHabit(deleteHabitId);
 
       toast.success("Habit deleted.");
+
+      setDeleteHabitId(null);
+
+      setShowDeleteModal(false);
 
       fetchHabits();
     } catch (error) {
@@ -95,11 +115,15 @@ function Habits() {
     }
   };
 
+  // Complete Habit
+
   const handleComplete = async (habit) => {
     try {
       await completeHabit(habit._id);
 
-      toast.success("Great! Habit completed.");
+      toast.success(
+        "Great! Habit completed."
+      );
 
       fetchHabits();
     } catch (error) {
@@ -108,9 +132,10 @@ function Habits() {
           "Unable to complete habit."
       );
     }
-  }; 
+  };
     return (
     <DashboardLayout>
+
       <div className="space-y-8">
 
         {/* Header */}
@@ -118,6 +143,7 @@ function Habits() {
         <div className="flex items-center justify-between">
 
           <div>
+
             <h1 className="text-3xl font-bold text-slate-900">
               Habit Tracker
             </h1>
@@ -125,6 +151,7 @@ function Habits() {
             <p className="mt-2 text-slate-500">
               Build strong financial habits and maintain your streak.
             </p>
+
           </div>
 
           <button
@@ -175,7 +202,7 @@ function Habits() {
                   setSelectedHabit(habit);
                   setShowModal(true);
                 }}
-                onDelete={handleDelete}
+                onDelete={openDeleteModal}
               />
 
             ))}
@@ -184,7 +211,7 @@ function Habits() {
 
         )}
 
-        {/* Modal */}
+        {/* Habit Modal */}
 
         {showModal && (
 
@@ -203,7 +230,24 @@ function Habits() {
 
         )}
 
+        {/* Delete Confirmation */}
+
+        <ConfirmModal
+          open={showDeleteModal}
+          title="Delete Habit"
+          message="Are you sure you want to delete this habit? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          danger={true}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setDeleteHabitId(null);
+          }}
+          onConfirm={handleDelete}
+        />
+
       </div>
+
     </DashboardLayout>
   );
 }

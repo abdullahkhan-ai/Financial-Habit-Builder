@@ -1,7 +1,12 @@
 import API from "./authService";
 
-const getToken = () =>
-  JSON.parse(localStorage.getItem("user"))?.token;
+const getToken = () => {
+  const user =
+    JSON.parse(localStorage.getItem("user")) ||
+    JSON.parse(sessionStorage.getItem("user"));
+
+  return user?.token;
+};
 
 const config = () => ({
   headers: {

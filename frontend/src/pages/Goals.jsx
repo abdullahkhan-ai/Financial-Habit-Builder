@@ -5,6 +5,7 @@ import DashboardLayout from "../components/layout/DashboardLayout";
 import GoalCard from "../components/ui/GoalCard";
 import GoalModal from "../components/ui/GoalModal";
 import AddSavingsModal from "../components/ui/AddSavingsModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
 
 import {
   getGoals,
@@ -18,10 +19,17 @@ function Goals() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showGoalModal, setShowGoalModal] = useState(false);
-  const [showSavingsModal, setShowSavingsModal] = useState(false);
+  const [showGoalModal, setShowGoalModal] =
+    useState(false);
 
-  const [selectedGoal, setSelectedGoal] = useState(null);
+  const [showSavingsModal, setShowSavingsModal] =
+    useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] =
+    useState(false);
+
+  const [selectedGoal, setSelectedGoal] =
+    useState(null);
 
   useEffect(() => {
     fetchGoals();
@@ -60,7 +68,10 @@ function Goals() {
 
   const handleUpdate = async (formData) => {
     try {
-      await updateGoal(selectedGoal._id, formData);
+      await updateGoal(
+        selectedGoal._id,
+        formData
+      );
 
       toast.success("Goal updated.");
 
@@ -76,13 +87,19 @@ function Goals() {
     }
   };
 
-  const handleDelete = async (goal) => {
-    if (!window.confirm("Delete this goal?")) return;
+  const openDeleteModal = (goal) => {
+    setSelectedGoal(goal);
+    setShowDeleteModal(true);
+  };
 
+  const handleDelete = async () => {
     try {
-      await deleteGoal(goal._id);
+      await deleteGoal(selectedGoal._id);
 
       toast.success("Goal deleted.");
+
+      setShowDeleteModal(false);
+      setSelectedGoal(null);
 
       fetchGoals();
     } catch (error) {
@@ -95,11 +112,15 @@ function Goals() {
 
   const handleAddSavings = async (amount) => {
     try {
-      await addSavings(selectedGoal._id, amount);
+      await addSavings(
+        selectedGoal._id,
+        amount
+      );
 
       toast.success("Savings added.");
 
       setShowSavingsModal(false);
+      setSelectedGoal(null);
 
       fetchGoals();
     } catch (error) {
@@ -132,7 +153,7 @@ function Goals() {
             setSelectedGoal(null);
             setShowGoalModal(true);
           }}
-          className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
+          className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
         >
           + New Goal
         </button>
@@ -164,7 +185,7 @@ function Goals() {
                 setSelectedGoal(goal);
                 setShowGoalModal(true);
               }}
-              onDelete={handleDelete}
+              onDelete={openDeleteModal}
               onAddSavings={(goal) => {
                 setSelectedGoal(goal);
                 setShowSavingsModal(true);
@@ -206,6 +227,20 @@ function Goals() {
         />
 
       )}
+
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Goal"
+        message="Are you sure you want to delete this goal? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger={true}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setSelectedGoal(null);
+        }}
+        onConfirm={handleDelete}
+      />
 
     </DashboardLayout>
   );

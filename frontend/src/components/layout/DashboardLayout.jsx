@@ -3,18 +3,28 @@ import Navbar from "./Navbar";
 
 function DashboardLayout({ children }) {
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex h-screen bg-slate-50">
 
-      {/* Sidebar */}
+      {/* Fixed Sidebar */}
+
       <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
+      {/* Right Section */}
+
+      <div className="ml-64 flex flex-1 flex-col">
+
+        {/* Sticky Navbar */}
 
         <Navbar />
 
-        <main className="flex-1 p-8">
-          {children}
+        {/* Scrollable Content */}
+
+        <main className="flex-1 overflow-y-auto bg-slate-50 px-6 py-6 lg:px-8">
+
+          <div className="mx-auto w-full">
+            {children}
+          </div>
+
         </main>
 
       </div>

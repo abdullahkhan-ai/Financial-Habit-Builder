@@ -1,66 +1,82 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { LogOut } from "lucide-react";
 
-import Modal from "../modal/Modal";
-
 function LogoutModal({
-  isOpen,
+  open,
   onClose,
   onConfirm,
 }) {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Logout"
-      maxWidth="max-w-md"
-    >
-      <div className="space-y-6">
+    <AnimatePresence>
 
-        <div className="flex justify-center">
+      {open && (
 
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm">
 
-            <LogOut
-              size={36}
-              className="text-red-600"
-            />
-
-          </div>
-
-        </div>
-
-        <div className="text-center">
-
-          <h2 className="text-xl font-bold text-slate-900">
-            Are you sure?
-          </h2>
-
-          <p className="mt-3 text-slate-500">
-            You will be logged out of your account.
-          </p>
-
-        </div>
-
-        <div className="flex justify-end gap-3">
-
-          <button
-            onClick={onClose}
-            className="rounded-2xl border border-slate-300 px-6 py-3 font-medium transition hover:bg-slate-100"
+          <motion.div
+            initial={{
+              opacity: 0,
+              scale: 0.9,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.9,
+              y: 20,
+            }}
+            transition={{
+              duration: 0.2,
+            }}
+            className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl"
           >
-            Cancel
-          </button>
 
-          <button
-            onClick={onConfirm}
-            className="rounded-2xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-700"
-          >
-            Logout
-          </button>
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+
+              <LogOut
+                size={30}
+                className="text-red-600"
+              />
+
+            </div>
+
+            <h2 className="mt-6 text-center text-2xl font-bold text-slate-900">
+              Logout
+            </h2>
+
+            <p className="mt-3 text-center text-slate-500">
+              Are you sure you want to logout from your account?
+            </p>
+
+            <div className="mt-8 flex gap-3">
+
+              <button
+                onClick={onClose}
+                className="flex-1 rounded-2xl border border-slate-300 py-3 font-semibold transition hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={onConfirm}
+                className="flex-1 rounded-2xl bg-red-600 py-3 font-semibold text-white transition hover:bg-red-700"
+              >
+                Logout
+              </button>
+
+            </div>
+
+          </motion.div>
 
         </div>
 
-      </div>
-    </Modal>
+      )}
+
+    </AnimatePresence>
   );
 }
 

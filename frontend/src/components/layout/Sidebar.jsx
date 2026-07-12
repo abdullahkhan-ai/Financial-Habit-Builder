@@ -10,19 +10,26 @@ import {
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 
 import LogoutModal from "../ui/LogoutModal";
 
 function Sidebar() {
+  const { user, logout } = useAuth();
+
   const navigate = useNavigate();
 
   const [showLogoutModal, setShowLogoutModal] =
     useState(false);
 
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
+  const handleLogout = () => {
+    logout();
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
 
   const menuItems = [
     {
@@ -57,7 +64,6 @@ function Sidebar() {
     },
   ];
 
-  // Show Admin only to Admin users
   if (user?.role === "admin") {
     menuItems.push({
       name: "Admin",
@@ -66,28 +72,20 @@ function Sidebar() {
     });
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-
-    navigate("/login", {
-      replace: true,
-    });
-  };
-
   return (
     <>
-      <aside className="flex h-screen w-64 flex-col border-r border-slate-200 bg-white">
+      <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-slate-200 bg-white">
 
         {/* Logo */}
 
-        <div className="border-b border-slate-200 px-6 py-6">
+        <div className="border-b border-slate-200 px-6 py-7">
 
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             FinHabit
           </h1>
 
           <p className="mt-1 text-sm text-slate-500">
-            Wealth Tracker
+            Wealth Growth Tracker
           </p>
 
         </div>
@@ -107,10 +105,10 @@ function Sidebar() {
                   <NavLink
                     to={item.path}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 rounded-xl px-4 py-3 font-medium transition-all duration-200 ${
+                      `flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-medium transition-all duration-200 ${
                         isActive
                           ? "bg-blue-600 text-white shadow-lg"
-                          : "text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-blue-600"
                       }`
                     }
                   >
@@ -137,7 +135,7 @@ function Sidebar() {
             onClick={() =>
               setShowLogoutModal(true)
             }
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium text-red-500 transition-all duration-200 hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 font-medium text-red-600 transition-all duration-200 hover:bg-red-50"
           >
 
             <LogOut size={20} />
@@ -151,12 +149,13 @@ function Sidebar() {
       </aside>
 
       <LogoutModal
-        isOpen={showLogoutModal}
+        open={showLogoutModal}
         onClose={() =>
           setShowLogoutModal(false)
         }
         onConfirm={handleLogout}
       />
+
     </>
   );
 }

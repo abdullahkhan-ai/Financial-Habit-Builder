@@ -6,6 +6,7 @@ function StatCard({
   icon: Icon,
   color = "blue",
   change = "",
+  onClick,
 }) {
   const colorClasses = {
     blue: "bg-blue-100 text-blue-600",
@@ -15,11 +16,18 @@ function StatCard({
   };
 
   return (
-    <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)]">
-
+    <div
+      onClick={onClick}
+      className={`rounded-3xl border border-white/60 bg-white/80 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)] ${
+        onClick
+          ? "cursor-pointer hover:border-blue-300 active:scale-[0.98]"
+          : ""
+      }`}
+    >
       <div className="flex items-center justify-between">
 
         <div>
+
           <p className="text-sm font-medium text-slate-500">
             {title}
           </p>
@@ -27,6 +35,7 @@ function StatCard({
           <h2 className="mt-2 text-3xl font-bold text-slate-900">
             {value}
           </h2>
+
         </div>
 
         <div
@@ -38,6 +47,7 @@ function StatCard({
       </div>
 
       {change && (
+
         <div className="mt-5 flex items-center gap-2 text-sm text-green-600">
 
           <TrendingUp size={16} />
@@ -45,6 +55,7 @@ function StatCard({
           <span>{change}</span>
 
         </div>
+
       )}
 
     </div>
