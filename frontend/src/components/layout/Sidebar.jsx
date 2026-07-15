@@ -5,6 +5,7 @@ import {
   Target,
   BarChart3,
   ClipboardCheck,
+  Bell,
   Shield,
   LogOut,
 } from "lucide-react";
@@ -62,6 +63,11 @@ function Sidebar() {
       icon: ClipboardCheck,
       path: "/habits",
     },
+    {
+      name: "Reminders",
+      icon: Bell,
+      path: "/reminders",
+    },
   ];
 
   if (user?.role === "admin") {
@@ -78,7 +84,7 @@ function Sidebar() {
 
         {/* Logo */}
 
-        <div className="border-b border-slate-200 px-6 py-7">
+        <div className="flex h-20 flex-col justify-center border-b border-slate-200 px-6">
 
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             FinHabit
@@ -95,8 +101,7 @@ function Sidebar() {
         <nav className="flex-1 overflow-y-auto px-4 py-6">
 
           <ul className="space-y-2">
-
-            {menuItems.map((item) => {
+                        {menuItems.map((item) => {
               const Icon = item.icon;
 
               return (

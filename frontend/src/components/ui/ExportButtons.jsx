@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  ChevronDown,
+  Download,
   FileSpreadsheet,
   FileText,
 } from "lucide-react";
@@ -12,10 +12,13 @@ function ExportButtons({
   const [open, setOpen] =
     useState(false);
 
-  const dropdownRef = useRef(null);
+  const dropdownRef =
+    useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (
+      event
+    ) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(
@@ -48,19 +51,11 @@ function ExportButtons({
         onClick={() =>
           setOpen(!open)
         }
-        className="flex items-center gap-2 rounded-2xl bg-slate-800 px-5 py-3 font-semibold text-white transition hover:bg-slate-900"
+        title="Export"
+        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md transition-all duration-200 hover:scale-105 hover:bg-blue-700"
       >
 
-        Export
-
-        <ChevronDown
-          size={18}
-          className={`transition duration-300 ${
-            open
-              ? "rotate-180"
-              : ""
-          }`}
-        />
+        <Download size={22} />
 
       </button>
 
@@ -73,7 +68,7 @@ function ExportButtons({
               setOpen(false);
               onPDF();
             }}
-            className="flex w-full items-center gap-3 px-5 py-4 text-left text-slate-700 transition hover:bg-slate-100"
+            className="flex w-full items-center gap-3 px-5 py-4 text-slate-700 transition hover:bg-slate-100"
           >
 
             <FileText
@@ -81,7 +76,9 @@ function ExportButtons({
               className="text-red-600"
             />
 
-            Export PDF
+            <span className="font-medium">
+              Export PDF
+            </span>
 
           </button>
 
@@ -90,7 +87,7 @@ function ExportButtons({
               setOpen(false);
               onCSV();
             }}
-            className="flex w-full items-center gap-3 border-t border-slate-200 px-5 py-4 text-left text-slate-700 transition hover:bg-slate-100"
+            className="flex w-full items-center gap-3 px-5 py-4 text-slate-700 transition hover:bg-slate-100"
           >
 
             <FileSpreadsheet
@@ -98,7 +95,9 @@ function ExportButtons({
               className="text-green-600"
             />
 
-            Export Excel
+            <span className="font-medium">
+              Export Excel
+            </span>
 
           </button>
 

@@ -1,4 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import { SearchProvider } from "./context/SearchContext";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -12,8 +19,10 @@ import Expenses from "./pages/Expenses";
 import Goals from "./pages/Goals";
 import Analytics from "./pages/Analytics";
 import Habits from "./pages/Habits";
+import Reminders from "./pages/Reminders";
 import Feedback from "./pages/Feedback";
 import Profile from "./pages/Profile";
+
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminFeedback from "./pages/AdminFeedback";
 
@@ -21,140 +30,167 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <SearchProvider>
+      <BrowserRouter>
+        <Routes>
 
-        <Route
-          path="/"
-          element={<Navigate to="/login" replace />}
-        />
+          {/* Default */}
 
-        {/* Authentication */}
+          <Route
+            path="/"
+            element={
+              <Navigate
+                to="/login"
+                replace
+              />
+            }
+          />
 
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+          {/* Authentication */}
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+          <Route
+            path="/login"
+            element={<Login />}
+          />
 
-        <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
-        />
+          <Route
+            path="/register"
+            element={<Register />}
+          />
 
-        <Route
-          path="/verify-otp"
-          element={<VerifyOTP />}
-        />
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
 
-        <Route
-          path="/reset-password"
-          element={<ResetPassword />}
-        />
+          <Route
+            path="/verify-otp"
+            element={<VerifyOTP />}
+          />
 
-        {/* Protected */}
+          <Route
+            path="/reset-password"
+            element={<ResetPassword />}
+          />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+          {/* User Routes */}
 
-        <Route
-          path="/income"
-          element={
-            <ProtectedRoute>
-              <Income />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/expenses"
-          element={
-            <ProtectedRoute>
-              <Expenses />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/income"
+            element={
+              <ProtectedRoute>
+                <Income />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/goals"
-          element={
-            <ProtectedRoute>
-              <Goals />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/expenses"
+            element={
+              <ProtectedRoute>
+                <Expenses />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/goals"
+            element={
+              <ProtectedRoute>
+                <Goals />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/habits"
-          element={
-            <ProtectedRoute>
-              <Habits />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/feedback"
-          element={
-            <ProtectedRoute>
-              <Feedback />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/habits"
+            element={
+              <ProtectedRoute>
+                <Habits />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/reminders"
+            element={
+              <ProtectedRoute>
+                <Reminders />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/feedback"
+            element={
+              <ProtectedRoute>
+                <Feedback />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/feedback"
-          element={
-            <ProtectedRoute>
-              <AdminFeedback />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="*"
-          element={<Navigate to="/login" replace />}
-        />
+          {/* Admin Routes */}
 
-      </Routes>
-    </BrowserRouter>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/feedback"
+            element={
+              <ProtectedRoute role="admin">
+                <AdminFeedback />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 */}
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to="/login"
+                replace
+              />
+            }
+          />
+
+        </Routes>
+      </BrowserRouter>
+    </SearchProvider>
   );
 }
 

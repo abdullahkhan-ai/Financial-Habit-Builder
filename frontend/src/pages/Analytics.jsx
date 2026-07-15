@@ -46,19 +46,19 @@ function Analytics() {
     const rows = [
       [
         "Total Income",
-        `₹${analytics.summary.totalIncome.toLocaleString(
+        `INR ${analytics.summary.totalIncome.toLocaleString(
           "en-IN"
         )}`,
       ],
       [
         "Total Expense",
-        `₹${analytics.summary.totalExpense.toLocaleString(
+        `INR ${analytics.summary.totalExpense.toLocaleString(
           "en-IN"
         )}`,
       ],
       [
         "Total Savings",
-        `₹${analytics.summary.totalSavings.toLocaleString(
+        `INR ${analytics.summary.totalSavings.toLocaleString(
           "en-IN"
         )}`,
       ],
@@ -79,21 +79,18 @@ function Analytics() {
   // Export Excel
 
   const handleExportCSV = () => {
-    exportToCSV(
-      [
-        {
-          TotalIncome:
-            analytics.summary.totalIncome,
-          TotalExpense:
-            analytics.summary.totalExpense,
-          TotalSavings:
-            analytics.summary.totalSavings,
-          SavingRate: `${analytics.summary.savingRate}%`,
-        },
-      ],
-      "analytics-report"
-    );
-  };
+  exportToCSV(
+    [
+      {
+        "Total Income": `INR ${analytics.summary.totalIncome.toLocaleString("en-IN")}`,
+        "Total Expense": `INR ${analytics.summary.totalExpense.toLocaleString("en-IN")}`,
+        "Total Savings": `INR ${analytics.summary.totalSavings.toLocaleString("en-IN")}`,
+        "Saving Rate": `${analytics.summary.savingRate}%`,
+      },
+    ],
+    "analytics-report"
+  );
+};
 
   if (loading) {
     return (

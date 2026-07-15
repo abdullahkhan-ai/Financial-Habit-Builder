@@ -1,14 +1,18 @@
-function RecentTransactions({ transactions = [] }) {
+function RecentTransactions({
+  transactions = [],
+}) {
   return (
-    <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+    <div className="flex h-full flex-col rounded-3xl border border-white/60 bg-white/80 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl">
 
-      <div className="mb-6 flex items-center justify-between">
+      {/* Header */}
+
+      <div className="sticky top-0 z-10 mb-5 flex items-center justify-between bg-white/80 pb-3 backdrop-blur-xl">
 
         <h2 className="text-xl font-bold text-slate-900">
           Recent Transactions
         </h2>
 
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-600">
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600">
           {transactions.length} Records
         </span>
 
@@ -16,19 +20,20 @@ function RecentTransactions({ transactions = [] }) {
 
       {transactions.length === 0 ? (
 
-        <div className="flex h-52 items-center justify-center text-slate-400">
+        <div className="flex flex-1 items-center justify-center text-slate-400">
+
           No transactions found.
+
         </div>
 
       ) : (
 
-        <div className="space-y-4">
-
-          {transactions.map((item) => (
+        <div className="flex-1 space-y-4 overflow-y-auto pr-2 scrollbar-hide max-h-[430px]">
+                      {transactions.map((item) => (
 
             <div
               key={item._id}
-              className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition hover:bg-slate-100"
+              className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-md"
             >
 
               <div>
@@ -74,7 +79,9 @@ function RecentTransactions({ transactions = [] }) {
                   }`}
                 >
                   {item.type === "Income" ? "+" : "-"}₹
-                  {Number(item.amount).toLocaleString("en-IN")}
+                  {Number(item.amount).toLocaleString(
+                    "en-IN"
+                  )}
                 </p>
 
                 <p className="text-xs text-slate-400">

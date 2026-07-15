@@ -137,7 +137,7 @@ function Expenses() {
     const rows = expenses.map((item) => [
       item.title,
       item.category,
-      `₹${item.amount}`,
+      `INR ${item.amount}`,
       new Date(
         item.date
       ).toLocaleDateString(),
@@ -154,11 +154,23 @@ function Expenses() {
   // Export Excel
 
   const handleExportCSV = () => {
-    exportToCSV(
-      expenses,
-      "expense-report"
-    );
-  };
+  exportToCSV(
+    expenses.map((item) => ({
+      Title: item.title,
+      Amount: `INR ${Number(item.amount).toLocaleString("en-IN")}`,
+      Category: item.category,
+      Date: new Date(item.date).toLocaleDateString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }
+      ),
+    })),
+    "expense-report"
+  );
+};
     return (
     <DashboardLayout>
 

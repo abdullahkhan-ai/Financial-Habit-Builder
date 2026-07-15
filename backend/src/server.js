@@ -65,6 +65,13 @@ const startServer = async () => {
       require("./routes/habitRoutes")
     );
 
+    // ================= REMINDERS =================
+
+    app.use(
+      "/api/reminders",
+      require("./routes/reminderRoutes")
+    );
+
     // ================= PROFILE =================
 
     app.use(

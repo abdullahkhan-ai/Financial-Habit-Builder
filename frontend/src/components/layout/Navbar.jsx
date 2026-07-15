@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Search,
   ChevronDown,
   KeyRound,
   MessageSquare,
+  UserCircle2,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+
 import ChangePasswordModal from "../ui/ChangePasswordModal";
+import SearchBox from "../search/SearchBox";
 
 const avatarColors = [
   "bg-red-500",
@@ -53,15 +55,21 @@ function Navbar() {
 
   const navigate = useNavigate();
 
-  const [open, setOpen] = useState(false);
-
-  const [showChangePassword, setShowChangePassword] =
+  const [open, setOpen] =
     useState(false);
 
-  const dropdownRef = useRef(null);
+  const [
+    showChangePassword,
+    setShowChangePassword,
+  ] = useState(false);
+
+  const dropdownRef =
+    useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (
+      event
+    ) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(
@@ -83,25 +91,15 @@ function Navbar() {
         handleClickOutside
       );
   }, []);
-
-  return (
+    return (
     <>
       <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white px-8">
 
         {/* Search */}
 
-        <div className="relative w-full max-w-md">
+        <div className="w-full max-w-md">
 
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
-          <input
-            type="text"
-            placeholder="Search income, expenses, goals..."
-            className="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-11 pr-4 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
-          />
+          <SearchBox />
 
         </div>
 
@@ -177,20 +175,29 @@ function Navbar() {
               {/* Menu */}
 
               <div className="p-2">
-
-                <button
+                                <button
                   onClick={() => {
                     setOpen(false);
-                    navigate(
-                      "/feedback"
-                    );
+                    navigate("/profile");
                   }}
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-700 transition hover:bg-slate-100"
                 >
 
-                  <MessageSquare
-                    size={18}
-                  />
+                  <UserCircle2 size={18} />
+
+                  Financial Profile
+
+                </button>
+
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    navigate("/feedback");
+                  }}
+                  className="mt-1 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-700 transition hover:bg-slate-100"
+                >
+
+                  <MessageSquare size={18} />
 
                   Feedback
 
@@ -199,16 +206,12 @@ function Navbar() {
                 <button
                   onClick={() => {
                     setOpen(false);
-                    setShowChangePassword(
-                      true
-                    );
+                    setShowChangePassword(true);
                   }}
                   className="mt-1 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-700 transition hover:bg-slate-100"
                 >
 
-                  <KeyRound
-                    size={18}
-                  />
+                  <KeyRound size={18} />
 
                   Change Password
 
@@ -227,9 +230,7 @@ function Navbar() {
       <ChangePasswordModal
         open={showChangePassword}
         onClose={() =>
-          setShowChangePassword(
-            false
-          )
+          setShowChangePassword(false)
         }
       />
 

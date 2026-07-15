@@ -32,7 +32,6 @@ function Dashboard() {
   const loadDashboard = async () => {
     try {
       const data = await getDashboard();
-
       setDashboardData(data);
     } catch (error) {
       console.error(error);
@@ -44,15 +43,11 @@ function Dashboard() {
   if (loading) {
     return (
       <DashboardLayout>
-
         <div className="flex h-[70vh] items-center justify-center">
-
           <p className="text-lg text-slate-500">
             Loading Dashboard...
           </p>
-
         </div>
-
       </DashboardLayout>
     );
   }
@@ -61,20 +56,6 @@ function Dashboard() {
     <DashboardLayout>
 
       <div className="space-y-8">
-
-        {/* Heading */}
-
-        <div>
-
-          <h1 className="text-3xl font-bold text-slate-900">
-            Dashboard
-          </h1>
-
-          <p className="mt-2 text-slate-500">
-            Welcome back! Here's your financial overview.
-          </p>
-
-        </div>
 
         {/* Stat Cards */}
 
@@ -140,35 +121,43 @@ function Dashboard() {
 
         </div>
 
-        {/* Charts */}
+        {/* Recent Transactions + Financial Health */}
 
-        <div className="grid gap-6 xl:grid-cols-3">
+        <div className="grid gap-6 xl:grid-cols-5">
 
-          <div className="xl:col-span-2">
+          <div className="xl:col-span-3">
 
-            <WealthChart
-              data={
-                dashboardData.chartData
+            <RecentTransactions
+              transactions={
+                dashboardData.recentTransactions
               }
             />
 
           </div>
 
-          <FinancialHealth
+          <div className="xl:col-span-2">
+
+            <FinancialHealth
+              data={
+                dashboardData.financialHealth
+              }
+            />
+
+          </div>
+
+        </div>
+
+        {/* Wealth Growth */}
+
+        <div className="pt-2">
+
+          <WealthChart
             data={
-              dashboardData.financialHealth
+              dashboardData.chartData
             }
           />
 
         </div>
-
-        {/* Recent Transactions */}
-
-        <RecentTransactions
-          transactions={
-            dashboardData.recentTransactions
-          }
-        />
 
       </div>
 
