@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
+const morgan = require("morgan");
 
 const connectDB = require("./config/db");
 
@@ -23,6 +24,14 @@ const startServer = async () => {
     app.use(cors());
 
     app.use(helmet());
+
+    // ================= REQUEST LOGGER =================
+
+    if (process.env.NODE_ENV === "production") {
+      app.use(morgan("combined"));
+    } else {
+      app.use(morgan("dev"));
+    }
 
     app.use(express.json());
 
