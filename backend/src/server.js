@@ -5,6 +5,11 @@ const helmet = require("helmet");
 
 const connectDB = require("./config/db");
 
+const {
+  apiLimiter,
+  authLimiter,
+} = require("./middleware/rateLimiter");
+
 dotenv.config();
 
 const startServer = async () => {
@@ -16,54 +21,94 @@ const startServer = async () => {
     // ================= MIDDLEWARE =================
 
     app.use(cors());
+
     app.use(helmet());
 
     app.use(express.json());
+
     app.use(express.urlencoded({ extended: true }));
+
+    // ================= RATE LIMITER =================
+
+    app.use("/api", apiLimiter);
 
     // ================= AUTH =================
 
-    app.use("/api/auth", require("./routes/authRoutes"));
+    app.use(
+      "/api/auth",
+      authLimiter,
+      require("./routes/authRoutes")
+    );
 
     // ================= INCOME =================
 
-    app.use("/api/income", require("./routes/incomeRoutes"));
+    app.use(
+      "/api/income",
+      require("./routes/incomeRoutes")
+    );
 
     // ================= EXPENSE =================
 
-    app.use("/api/expense", require("./routes/expenseRoutes"));
+    app.use(
+      "/api/expense",
+      require("./routes/expenseRoutes")
+    );
 
     // ================= DASHBOARD =================
 
-    app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+    app.use(
+      "/api/dashboard",
+      require("./routes/dashboardRoutes")
+    );
 
     // ================= GOALS =================
 
-    app.use("/api/goals", require("./routes/goalRoutes"));
+    app.use(
+      "/api/goals",
+      require("./routes/goalRoutes")
+    );
 
     // ================= ANALYTICS =================
 
-    app.use("/api/analytics", require("./routes/analyticsRoutes"));
+    app.use(
+      "/api/analytics",
+      require("./routes/analyticsRoutes")
+    );
 
     // ================= HABITS =================
 
-    app.use("/api/habits", require("./routes/habitRoutes"));
+    app.use(
+      "/api/habits",
+      require("./routes/habitRoutes")
+    );
 
     // ================= REMINDERS =================
 
-    app.use("/api/reminders", require("./routes/reminderRoutes"));
+    app.use(
+      "/api/reminders",
+      require("./routes/reminderRoutes")
+    );
 
     // ================= PROFILE =================
 
-    app.use("/api/profile", require("./routes/profileRoutes"));
+    app.use(
+      "/api/profile",
+      require("./routes/profileRoutes")
+    );
 
     // ================= ADMIN =================
 
-    app.use("/api/admin", require("./routes/adminRoutes"));
+    app.use(
+      "/api/admin",
+      require("./routes/adminRoutes")
+    );
 
     // ================= FEEDBACK =================
 
-    app.use("/api/feedback", require("./routes/feedbackRoutes"));
+    app.use(
+      "/api/feedback",
+      require("./routes/feedbackRoutes")
+    );
 
     // ================= ROOT =================
 
