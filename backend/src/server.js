@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const connectDB = require("./config/db");
 
@@ -12,109 +13,75 @@ const startServer = async () => {
 
     const app = express();
 
+    // ================= MIDDLEWARE =================
+
     app.use(cors());
+    app.use(helmet());
 
     app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
 
     // ================= AUTH =================
 
-    app.use(
-      "/api/auth",
-      require("./routes/authRoutes")
-    );
+    app.use("/api/auth", require("./routes/authRoutes"));
 
     // ================= INCOME =================
 
-    app.use(
-      "/api/income",
-      require("./routes/incomeRoutes")
-    );
+    app.use("/api/income", require("./routes/incomeRoutes"));
 
     // ================= EXPENSE =================
 
-    app.use(
-      "/api/expense",
-      require("./routes/expenseRoutes")
-    );
+    app.use("/api/expense", require("./routes/expenseRoutes"));
 
     // ================= DASHBOARD =================
 
-    app.use(
-      "/api/dashboard",
-      require("./routes/dashboardRoutes")
-    );
+    app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 
     // ================= GOALS =================
 
-    app.use(
-      "/api/goals",
-      require("./routes/goalRoutes")
-    );
+    app.use("/api/goals", require("./routes/goalRoutes"));
 
     // ================= ANALYTICS =================
 
-    app.use(
-      "/api/analytics",
-      require("./routes/analyticsRoutes")
-    );
+    app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
     // ================= HABITS =================
 
-    app.use(
-      "/api/habits",
-      require("./routes/habitRoutes")
-    );
+    app.use("/api/habits", require("./routes/habitRoutes"));
 
     // ================= REMINDERS =================
 
-    app.use(
-      "/api/reminders",
-      require("./routes/reminderRoutes")
-    );
+    app.use("/api/reminders", require("./routes/reminderRoutes"));
 
     // ================= PROFILE =================
 
-    app.use(
-      "/api/profile",
-      require("./routes/profileRoutes")
-    );
+    app.use("/api/profile", require("./routes/profileRoutes"));
 
     // ================= ADMIN =================
 
-    app.use(
-      "/api/admin",
-      require("./routes/adminRoutes")
-    );
+    app.use("/api/admin", require("./routes/adminRoutes"));
 
     // ================= FEEDBACK =================
 
-    app.use(
-      "/api/feedback",
-      require("./routes/feedbackRoutes")
-    );
+    app.use("/api/feedback", require("./routes/feedbackRoutes"));
 
     // ================= ROOT =================
 
     app.get("/", (req, res) => {
-      res.send(
-        "Financial Habit Builder Backend Running 🚀"
-      );
+      res.send("Financial Habit Builder Backend Running 🚀");
     });
 
-    const PORT =
-      process.env.PORT || 5000;
+    // ================= SERVER =================
+
+    const PORT = process.env.PORT || 5000;
 
     app.listen(PORT, () => {
-      console.log(
-        `Server running on port ${PORT}`
-      );
+      console.log(`🚀 Server running on port ${PORT}`);
     });
 
   } catch (error) {
-    console.error(
-      "Server Startup Failed:",
-      error.message
-    );
+    console.error("❌ Server Startup Failed:", error.message);
+    process.exit(1);
   }
 };
 
