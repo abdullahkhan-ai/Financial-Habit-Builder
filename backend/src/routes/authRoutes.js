@@ -10,13 +10,30 @@ const {
   resetPassword,
 } = require("../controllers/authController");
 
-const {
-  protect,
-} = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
-// Public Routes
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+const validateRequest = require("../validators/validateRequest");
+
+const {
+  registerValidator,
+  loginValidator,
+} = require("../validators/authValidator");
+
+// ================= PUBLIC ROUTES =================
+
+router.post(
+  "/register",
+  registerValidator,
+  validateRequest,
+  registerUser
+);
+
+router.post(
+  "/login",
+  loginValidator,
+  validateRequest,
+  loginUser
+);
 
 router.post(
   "/forgot-password",
@@ -33,7 +50,8 @@ router.post(
   resetPassword
 );
 
-// Protected Routes
+// ================= PROTECTED ROUTES =================
+
 router.put(
   "/change-password",
   protect,
