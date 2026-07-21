@@ -10,14 +10,33 @@ const {
 
 const { protect } = require("../middleware/authMiddleware");
 
+const validateRequest = require("../validators/validateRequest");
+
+const {
+  expenseValidator,
+} = require("../validators/expenseValidator");
+
 router
   .route("/")
   .get(protect, getExpense)
-  .post(protect, createExpense);
+  .post(
+    protect,
+    expenseValidator,
+    validateRequest,
+    createExpense
+  );
 
 router
   .route("/:id")
-  .put(protect, updateExpense)
-  .delete(protect, deleteExpense);
+  .put(
+    protect,
+    expenseValidator,
+    validateRequest,
+    updateExpense
+  )
+  .delete(
+    protect,
+    deleteExpense
+  );
 
 module.exports = router;
