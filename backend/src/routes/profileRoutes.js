@@ -11,6 +11,12 @@ const {
   protect,
 } = require("../middleware/authMiddleware");
 
+const validateRequest = require("../validators/validateRequest");
+
+const {
+  profileValidator,
+} = require("../validators/profileValidator");
+
 // Get Profile
 router.get(
   "/",
@@ -22,6 +28,8 @@ router.get(
 router.put(
   "/",
   protect,
+  profileValidator,
+  validateRequest,
   updateProfile
 );
 
