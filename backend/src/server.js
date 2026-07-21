@@ -11,6 +11,9 @@ const {
   authLimiter,
 } = require("./middleware/rateLimiter");
 
+const notFound = require("./middleware/notFound");
+const errorHandler = require("./middleware/errorHandler");
+
 dotenv.config();
 
 const startServer = async () => {
@@ -24,8 +27,6 @@ const startServer = async () => {
     app.use(cors());
 
     app.use(helmet());
-
-    // ================= REQUEST LOGGER =================
 
     if (process.env.NODE_ENV === "production") {
       app.use(morgan("combined"));
@@ -124,6 +125,14 @@ const startServer = async () => {
     app.get("/", (req, res) => {
       res.send("Financial Habit Builder Backend Running 🚀");
     });
+
+    // ================= 404 =================
+
+    app.use(notFound);
+
+    // ================= ERROR HANDLER =================
+
+    app.use(errorHandler);
 
     // ================= SERVER =================
 
