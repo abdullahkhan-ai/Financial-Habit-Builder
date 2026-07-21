@@ -11,15 +11,34 @@ const {
   deleteHabit,
 } = require("../controllers/habitController");
 
+const validateRequest = require("../validators/validateRequest");
+
+const {
+  habitValidator,
+} = require("../validators/habitValidator");
+
 router
   .route("/")
   .get(protect, getHabits)
-  .post(protect, createHabit);
+  .post(
+    protect,
+    habitValidator,
+    validateRequest,
+    createHabit
+  );
 
 router
   .route("/:id")
-  .put(protect, updateHabit)
-  .delete(protect, deleteHabit);
+  .put(
+    protect,
+    habitValidator,
+    validateRequest,
+    updateHabit
+  )
+  .delete(
+    protect,
+    deleteHabit
+  );
 
 router.patch(
   "/:id/complete",
