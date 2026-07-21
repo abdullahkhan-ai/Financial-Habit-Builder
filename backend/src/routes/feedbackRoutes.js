@@ -15,12 +15,20 @@ const {
   adminOnly,
 } = require("../middleware/authMiddleware");
 
+const validateRequest = require("../validators/validateRequest");
+
+const {
+  feedbackValidator,
+} = require("../validators/feedbackValidator");
+
 // ================= USER =================
 
 // Submit Feedback
 router.post(
   "/",
   protect,
+  feedbackValidator,
+  validateRequest,
   createFeedback
 );
 
