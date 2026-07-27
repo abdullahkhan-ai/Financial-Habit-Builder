@@ -50,4 +50,9 @@ const incomeSchema = new mongoose.Schema(
   }
 );
 
+// Performance Indexes
+incomeSchema.index({ user: 1 });
+incomeSchema.index({ user: 1, date: 1 });
+incomeSchema.index({ category: 1 });
+
 module.exports = mongoose.model("Income", incomeSchema);

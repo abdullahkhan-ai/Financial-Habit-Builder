@@ -1,10 +1,15 @@
-import { Wallet, Receipt, PiggyBank, Percent } from "lucide-react";
+import {
+  Wallet,
+  Receipt,
+  PiggyBank,
+  Percent,
+} from "lucide-react";
+
 import StatCard from "./StatCard";
 
 function AnalyticsCards({ summary }) {
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
         title="Total Income"
         value={`₹${summary.totalIncome.toLocaleString("en-IN")}`}
@@ -36,7 +41,6 @@ function AnalyticsCards({ summary }) {
         color="purple"
         change="Efficiency"
       />
-
     </div>
   );
 }

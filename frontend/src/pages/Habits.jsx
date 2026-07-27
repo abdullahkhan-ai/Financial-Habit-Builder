@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
+import { Repeat } from "lucide-react";
 import toast from "react-hot-toast";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import HabitCard from "../components/ui/HabitCard";
 import HabitModal from "../components/ui/HabitModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import EmptyState from "../components/ui/EmptyState";
+
+import PageHeaderSkeleton from "../components/ui/PageHeaderSkeleton";
+import HabitCardSkeleton from "../components/ui/HabitCardSkeleton";
 
 import {
   getHabits,
@@ -88,8 +93,6 @@ function Habits() {
     }
   };
 
-  // Delete
-
   const openDeleteModal = (habit) => {
     setDeleteHabitId(habit._id);
 
@@ -115,8 +118,6 @@ function Habits() {
     }
   };
 
-  // Complete Habit
-
   const handleComplete = async (habit) => {
     try {
       await completeHabit(habit._id);
@@ -133,120 +134,118 @@ function Habits() {
       );
     }
   };
-    return (
+
+  return (
     <DashboardLayout>
 
-      <div className="space-y-8">
-
-        {/* Header */}
-
-        <div className="flex items-center justify-between">
-
-          <div>
-
-            <h1 className="text-3xl font-bold text-slate-900">
-              Habit Tracker
-            </h1>
-
-            <p className="mt-2 text-slate-500">
-              Build strong financial habits and maintain your streak.
-            </p>
-
-          </div>
-
-          <button
-            onClick={() => {
-              setSelectedHabit(null);
-              setShowModal(true);
-            }}
-            className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-          >
-            + New Habit
-          </button>
-
-        </div>
-
-        {/* Loading */}
-
-        {loading ? (
-
-          <div className="rounded-3xl bg-white p-12 text-center">
-            Loading habits...
-          </div>
-
-        ) : habits.length === 0 ? (
-
-          <div className="rounded-3xl bg-white p-16 text-center shadow-sm">
-
-            <h2 className="text-2xl font-bold text-slate-900">
-              No Habits Yet
-            </h2>
-
-            <p className="mt-3 text-slate-500">
-              Create your first financial habit and start building consistency.
-            </p>
-
-          </div>
-
-        ) : (
+      {loading ? (
+        <>
+          <PageHeaderSkeleton />
 
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <HabitCardSkeleton key={item} />
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="space-y-8">
 
-            {habits.map((habit) => (
+          <div className="flex items-center justify-between">
 
-              <HabitCard
+            <div>
+
+              <h1 className="text-3xl font-bold text-slate-900">
+                Habit Tracker
+              </h1>
+
+              <p className="mt-2 max-w-xl text-slate-500">
+                Build strong financial habits, maintain your streak, and improve your money management one day at a time.
+              </p>
+
+            </div>
+
+            <button
+              onClick={() => {
+                setSelectedHabit(null);
+                setShowModal(true);
+              }}
+              className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+            >
+              + New Habit
+            </button>
+
+          </div>
+
+          {habits.length === 0 ? (
+
+            <EmptyState
+              icon={Repeat}
+              title="No Habits Yet"
+              description="Create your first financial habit and start building consistency one day at a time."
+              buttonText="New Habit"
+              onButtonClick={() => {
+                setSelectedHabit(null);
+                setShowModal(true);
+              }}
+            />
+
+          ) : (
+
+            <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+
+              {habits.map((habit) => (
+                              <HabitCard
                 key={habit._id}
                 habit={habit}
-                onComplete={handleComplete}
-                onEdit={(habit) => {
+                onComplete={() =>
+                  handleComplete(habit)
+                }
+                onEdit={() => {
                   setSelectedHabit(habit);
                   setShowModal(true);
                 }}
-                onDelete={openDeleteModal}
+                onDelete={() =>
+                  openDeleteModal(habit)
+                }
               />
-
             ))}
 
-          </div>
+            </div>
 
-        )}
+          )}
 
-        {/* Habit Modal */}
+        </div>
+      )}
 
-        {showModal && (
-
-          <HabitModal
-            initialData={selectedHabit}
-            onClose={() => {
-              setShowModal(false);
-              setSelectedHabit(null);
-            }}
-            onSave={
-              selectedHabit
-                ? handleUpdate
-                : handleCreate
-            }
-          />
-
-        )}
-
-        {/* Delete Confirmation */}
-
-        <ConfirmModal
-          open={showDeleteModal}
-          title="Delete Habit"
-          message="Are you sure you want to delete this habit? This action cannot be undone."
-          confirmText="Delete"
-          cancelText="Cancel"
-          danger={true}
+      {showModal && (
+        <HabitModal
+          initialData={selectedHabit}
           onClose={() => {
-            setShowDeleteModal(false);
-            setDeleteHabitId(null);
+            setShowModal(false);
+            setSelectedHabit(null);
           }}
-          onConfirm={handleDelete}
+          onSave={
+            selectedHabit
+              ? handleUpdate
+              : handleCreate
+          }
         />
+      )}
 
-      </div>
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Habit"
+        message="Are you sure you want to delete this habit? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        danger
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeleteHabitId(null);
+        }}
+        onConfirm={handleDelete}
+      />
 
     </DashboardLayout>
   );

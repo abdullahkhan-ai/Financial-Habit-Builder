@@ -13,12 +13,12 @@ import AnalyticsTooltip from "./AnalyticsTooltip";
 function IncomeExpenseChart({ data = [] }) {
   if (!data.length) {
     return (
-      <div className="flex h-[420px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-slate-900">
+      <div className="flex h-[320px] sm:h-[420px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
           Income vs Expense
         </h2>
 
-        <p className="mt-8 text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-500 sm:mt-8 sm:text-base">
           No analytics data available.
         </p>
       </div>
@@ -26,9 +26,9 @@ function IncomeExpenseChart({ data = [] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-slate-900">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="mb-5 sm:mb-6">
+        <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
           Income vs Expense
         </h2>
 
@@ -37,9 +37,17 @@ function IncomeExpenseChart({ data = [] }) {
         </p>
       </div>
 
-      <div className="h-80">
+      <div className="h-72 sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart
+            data={data}
+            margin={{
+              top: 5,
+              right: 5,
+              left: -20,
+              bottom: 5,
+            }}
+          >
             <CartesianGrid
               stroke="#E2E8F0"
               strokeDasharray="3 3"
@@ -47,15 +55,16 @@ function IncomeExpenseChart({ data = [] }) {
 
             <XAxis
               dataKey="month"
-              tick={{ fill: "#64748B" }}
+              tick={{ fill: "#64748B", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
             />
 
             <YAxis
-              tick={{ fill: "#64748B" }}
+              tick={{ fill: "#64748B", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
+              width={45}
             />
 
             <Tooltip
@@ -67,8 +76,8 @@ function IncomeExpenseChart({ data = [] }) {
               dataKey="income"
               stroke="#22C55E"
               strokeWidth={3}
-              dot={{ r: 5 }}
-              activeDot={{ r: 7 }}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
             />
 
             <Line
@@ -76,8 +85,8 @@ function IncomeExpenseChart({ data = [] }) {
               dataKey="expense"
               stroke="#EF4444"
               strokeWidth={3}
-              dot={{ r: 5 }}
-              activeDot={{ r: 7 }}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -4,6 +4,8 @@ import TransactionTable from "../components/table/TransactionTable";
 import ExpenseModal from "../components/ui/ExpenseModal";
 import ExportButtons from "../components/ui/ExportButtons";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import PageHeaderSkeleton from "../components/ui/PageHeaderSkeleton";
+import TableSkeleton from "../components/ui/TableSkeleton";
 
 import {
   exportToPDF,
@@ -23,9 +25,7 @@ function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showModal, setShowModal] =
-    useState(false);
-
+  const [showModal, setShowModal] = useState(false);
   const [selectedExpense, setSelectedExpense] =
     useState(null);
 
@@ -42,7 +42,6 @@ function Expenses() {
   const fetchExpenses = async () => {
     try {
       const data = await getExpense();
-
       setExpenses(data);
     } catch (error) {
       toast.error(
@@ -85,7 +84,6 @@ function Expenses() {
       );
 
       setSelectedExpense(null);
-
       setShowModal(false);
 
       fetchExpenses();
@@ -97,11 +95,8 @@ function Expenses() {
     }
   };
 
-  // Delete
-
   const openDeleteModal = (expense) => {
     setDeleteExpenseId(expense._id);
-
     setShowDeleteModal(true);
   };
 
@@ -112,7 +107,6 @@ function Expenses() {
       toast.success("Expense deleted.");
 
       setShowDeleteModal(false);
-
       setDeleteExpenseId(null);
 
       fetchExpenses();
@@ -123,8 +117,6 @@ function Expenses() {
       );
     }
   };
-
-  // Export PDF
 
   const handleExportPDF = () => {
     const columns = [
@@ -138,9 +130,7 @@ function Expenses() {
       item.title,
       item.category,
       `INR ${item.amount}`,
-      new Date(
-        item.date
-      ).toLocaleDateString(),
+      new Date(item.date).toLocaleDateString(),
     ]);
 
     exportToPDF(
@@ -151,87 +141,87 @@ function Expenses() {
     );
   };
 
-  // Export Excel
-
   const handleExportCSV = () => {
-  exportToCSV(
-    expenses.map((item) => ({
-      Title: item.title,
-      Amount: `INR ${Number(item.amount).toLocaleString("en-IN")}`,
-      Category: item.category,
-      Date: new Date(item.date).toLocaleDateString(
-        "en-IN",
-        {
+    exportToCSV(
+      expenses.map((item) => ({
+        Title: item.title,
+        Amount: `INR ${Number(
+          item.amount
+        ).toLocaleString("en-IN")}`,
+        Category: item.category,
+        Date: new Date(
+          item.date
+        ).toLocaleDateString("en-IN", {
           day: "2-digit",
           month: "short",
           year: "numeric",
-        }
-      ),
-    })),
-    "expense-report"
-  );
-};
-    return (
+        }),
+      })),
+      "expense-report"
+    );
+  };
+
+  return (
     <DashboardLayout>
-
-      <div className="mb-8 flex items-center justify-between">
-
-        <div>
-
-          <h1 className="text-3xl font-bold text-slate-900">
-            Expenses
-          </h1>
-
-          <p className="mt-2 text-slate-500">
-            Manage all your expenses.
-          </p>
-
-        </div>
-
-        <div className="flex gap-3">
-
-          <ExportButtons
-            onPDF={handleExportPDF}
-            onCSV={handleExportCSV}
+      {loading ? (
+        <>
+          <PageHeaderSkeleton />
+          <TableSkeleton
+            rows={6}
+            columns={5}
           />
+        </>
+      ) : (
+        <>
+          <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl">
+                Expenses
+              </h1>
 
-          <button
-            onClick={() => {
+              <p className="mt-2 text-slate-500">
+                Manage all your expenses.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <ExportButtons
+                onPDF={handleExportPDF}
+                onCSV={handleExportCSV}
+              />
+
+              <button
+                onClick={() => {
+                  setSelectedExpense(null);
+                  setShowModal(true);
+                }}
+                className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+              >
+                + Add Expense
+              </button>
+            </div>
+          </div>
+
+          <TransactionTable
+            data={expenses}
+            titleField="title"
+            emptyTitle="No Expenses Yet"
+            emptyMessage="Start tracking your expenses to understand where your money goes and improve your spending habits."
+            emptyButtonText="Add Expense"
+            onEmptyButtonClick={() => {
               setSelectedExpense(null);
               setShowModal(true);
             }}
-            className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-          >
-            + Add Expense
-          </button>
-
-        </div>
-
-      </div>
-
-      {loading ? (
-
-        <div className="rounded-3xl bg-white p-10 text-center">
-          Loading...
-        </div>
-
-      ) : (
-
-        <TransactionTable
-          data={expenses}
-          titleField="title"
-          emptyMessage="No expenses found."
-          onEdit={(expense) => {
-            setSelectedExpense(expense);
-            setShowModal(true);
-          }}
-          onDelete={openDeleteModal}
-        />
-
+            onEdit={(expense) => {
+              setSelectedExpense(expense);
+              setShowModal(true);
+            }}
+            onDelete={openDeleteModal}
+          />
+        </>
       )}
 
       {showModal && (
-
         <ExpenseModal
           initialData={selectedExpense}
           onClose={() => {
@@ -244,7 +234,6 @@ function Expenses() {
               : handleCreate
           }
         />
-
       )}
 
       <ConfirmModal
@@ -253,14 +242,13 @@ function Expenses() {
         message="Are you sure you want to delete this expense? This action cannot be undone."
         confirmText="Delete"
         cancelText="Cancel"
-        danger={true}
+        danger
         onClose={() => {
           setShowDeleteModal(false);
           setDeleteExpenseId(null);
         }}
         onConfirm={handleDelete}
       />
-
     </DashboardLayout>
   );
 }

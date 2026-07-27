@@ -7,16 +7,22 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 
+import ErrorBoundary from "./components/ErrorBoundary";
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
 
-    <AuthProvider>
+    <ErrorBoundary>
 
-      <Toaster position="top-right" />
+      <AuthProvider>
 
-      <App />
+        <Toaster position="top-right" />
 
-    </AuthProvider>
+        <App />
+
+      </AuthProvider>
+
+    </ErrorBoundary>
 
   </StrictMode>
 );

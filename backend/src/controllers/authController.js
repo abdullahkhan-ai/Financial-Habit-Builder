@@ -9,6 +9,7 @@ const sendEmail = require("../utils/sendEmail");
 // =========================
 // Register User
 // =========================
+
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -25,19 +26,19 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const userExists = await User.findOne({ email });
+    const existingUser = await User.findOne({
+      email,
+    }).select("_id");
 
-    if (userExists) {
+    if (existingUser) {
       return res.status(400).json({
         message: "User already exists",
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-
     const hashedPassword = await bcrypt.hash(
       password,
-      salt
+      10
     );
 
     const user = await User.create({
@@ -46,7 +47,7 @@ const registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -54,8 +55,10 @@ const registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error("Register Error:", error);
+
+    return res.status(500).json({
+      message: "Registration failed.",
     });
   }
 };
@@ -63,6 +66,7 @@ const registerUser = async (req, res) => {
 // =========================
 // Login User
 // =========================
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -73,27 +77,41 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      email,
+    }).select(
+      "_id name email role password"
+    );
 
-    if (
-      user &&
-      (await bcrypt.compare(password, user.password))
-    ) {
-      return res.status(200).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password",
       });
     }
 
-    return res.status(401).json({
-      message: "Invalid email or password",
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
+    }
+
+    return res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error("Login Error:", error);
+
+    return res.status(500).json({
+      message: "Login failed.",
     });
   }
 };
@@ -101,6 +119,7 @@ const loginUser = async (req, res) => {
 // =========================
 // Change Password
 // =========================
+
 const changePassword = async (req, res) => {
   try {
     const {
@@ -132,7 +151,9 @@ const changePassword = async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(
+      req.user._id
+    ).select("password");
 
     const isMatch = await bcrypt.compare(
       currentPassword,
@@ -141,25 +162,30 @@ const changePassword = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).json({
-        message: "Current password is incorrect.",
+        message:
+          "Current password is incorrect.",
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-
     user.password = await bcrypt.hash(
       newPassword,
-      salt
+      10
     );
 
     await user.save();
 
-    res.status(200).json({
-      message: "Password updated successfully.",
+    return res.status(200).json({
+      message:
+        "Password updated successfully.",
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error(
+      "Change Password Error:",
+      error
+    );
+
+    return res.status(500).json({
+      message: "Failed to update password.",
     });
   }
 };
@@ -167,6 +193,7 @@ const changePassword = async (req, res) => {
 // =========================
 // Forgot Password
 // =========================
+
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -180,8 +207,7 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({
       email,
     });
-
-    if (!user) {
+        if (!user) {
       return res.status(404).json({
         message: "No account found with this email.",
       });
@@ -223,12 +249,17 @@ const forgotPassword = async (req, res) => {
       html
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "OTP sent successfully.",
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error(
+      "Forgot Password Error:",
+      error
+    );
+
+    return res.status(500).json({
+      message: "Failed to send OTP.",
     });
   }
 };
@@ -236,6 +267,7 @@ const forgotPassword = async (req, res) => {
 // =========================
 // Verify OTP
 // =========================
+
 const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -248,7 +280,9 @@ const verifyOTP = async (req, res) => {
 
     const user = await User.findOne({
       email,
-    });
+    }).select(
+      "resetOTP resetOTPExpire resetVerified"
+    );
 
     if (!user) {
       return res.status(404).json({
@@ -274,12 +308,17 @@ const verifyOTP = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "OTP verified successfully.",
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error(
+      "Verify OTP Error:",
+      error
+    );
+
+    return res.status(500).json({
+      message: "OTP verification failed.",
     });
   }
 };
@@ -287,19 +326,23 @@ const verifyOTP = async (req, res) => {
 // =========================
 // Reset Password
 // =========================
+
 const resetPassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
 
     if (!email || !newPassword) {
       return res.status(400).json({
-        message: "Email and password are required.",
+        message:
+          "Email and password are required.",
       });
     }
 
     const user = await User.findOne({
       email,
-    });
+    }).select(
+      "password resetOTP resetOTPExpire resetVerified"
+    );
 
     if (!user) {
       return res.status(404).json({
@@ -314,11 +357,9 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-
     user.password = await bcrypt.hash(
       newPassword,
-      salt
+      10
     );
 
     user.resetOTP = null;
@@ -327,12 +368,19 @@ const resetPassword = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({
-      message: "Password reset successfully.",
+    return res.status(200).json({
+      message:
+        "Password reset successfully.",
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error(
+      "Reset Password Error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "Password reset failed.",
     });
   }
 };

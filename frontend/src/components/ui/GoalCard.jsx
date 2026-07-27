@@ -2,7 +2,6 @@ import {
   Pencil,
   Trash2,
   Plus,
-  CheckCircle2,
 } from "lucide-react";
 
 function GoalCard({
@@ -27,95 +26,78 @@ function GoalCard({
   );
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-6">
       {/* Header */}
 
-      <div className="flex items-start justify-between">
-
-        <div>
-
-          <h3 className="text-xl font-bold text-slate-900">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <h3 className="break-words text-lg font-bold text-slate-900 sm:text-xl">
             {goal.title}
           </h3>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 break-words text-sm text-slate-500">
             {goal.category}
           </p>
-
         </div>
 
         {goal.status === "Completed" ? (
-          <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+          <span className="w-fit rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
             Completed
           </span>
         ) : (
-          <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
+          <span className="w-fit rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
             Active
           </span>
         )}
-
       </div>
 
       {/* Progress */}
 
       <div className="mt-6">
-
-        <div className="mb-2 flex justify-between text-sm">
-
-          <span>
+        <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+          <span className="font-medium">
             ₹{goal.savedAmount.toLocaleString("en-IN")}
           </span>
 
-          <span>
+          <span className="text-right font-medium">
             ₹{goal.targetAmount.toLocaleString("en-IN")}
           </span>
-
         </div>
 
         <div className="h-3 overflow-hidden rounded-full bg-slate-200">
-
           <div
             className="h-full rounded-full bg-blue-600 transition-all duration-700"
             style={{
               width: `${progress}%`,
             }}
           />
-
         </div>
 
-        <div className="mt-2 flex justify-between text-sm">
-
+        <div className="mt-2 flex items-center justify-between gap-3 text-sm">
           <span className="font-semibold text-blue-600">
             {progress}%
           </span>
 
-          <span className="text-slate-500">
+          <span className="text-right text-slate-500">
             Remaining ₹
             {remaining.toLocaleString("en-IN")}
           </span>
-
         </div>
-
       </div>
 
       {/* Footer */}
 
-      <div className="mt-6 flex items-center justify-between">
-
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-slate-500">
-
           {goal.status === "Completed"
             ? "Goal Achieved"
             : `${daysLeft} days left`}
-
         </div>
 
-        <div className="flex gap-2">
-
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => onAddSavings(goal)}
-            className="rounded-xl bg-green-50 p-2 text-green-600 transition hover:bg-green-100"
+            className="rounded-xl bg-green-50 p-2.5 text-green-600 transition hover:bg-green-100"
             title="Add Savings"
           >
             <Plus size={18} />
@@ -123,7 +105,7 @@ function GoalCard({
 
           <button
             onClick={() => onEdit(goal)}
-            className="rounded-xl bg-blue-50 p-2 text-blue-600 transition hover:bg-blue-100"
+            className="rounded-xl bg-blue-50 p-2.5 text-blue-600 transition hover:bg-blue-100"
             title="Edit"
           >
             <Pencil size={18} />
@@ -131,16 +113,13 @@ function GoalCard({
 
           <button
             onClick={() => onDelete(goal)}
-            className="rounded-xl bg-red-50 p-2 text-red-600 transition hover:bg-red-100"
+            className="rounded-xl bg-red-50 p-2.5 text-red-600 transition hover:bg-red-100"
             title="Delete"
           >
             <Trash2 size={18} />
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }

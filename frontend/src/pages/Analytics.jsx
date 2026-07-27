@@ -9,6 +9,11 @@ import ExpensePieChart from "../components/ui/ExpensePieChart";
 import HighestTransactionCard from "../components/ui/HighestTransactionCard";
 import ExportButtons from "../components/ui/ExportButtons";
 
+import PageHeaderSkeleton from "../components/ui/PageHeaderSkeleton";
+import StatCardSkeleton from "../components/ui/StatCardSkeleton";
+import CardSkeleton from "../components/ui/CardSkeleton";
+import ChartSkeleton from "../components/ui/ChartSkeleton";
+
 import {
   exportToPDF,
   exportToCSV,
@@ -38,29 +43,21 @@ function Analytics() {
     }
   };
 
-  // Export PDF
-
   const handleExportPDF = () => {
     const columns = ["Metric", "Value"];
 
     const rows = [
       [
         "Total Income",
-        `INR ${analytics.summary.totalIncome.toLocaleString(
-          "en-IN"
-        )}`,
+        `INR ${analytics.summary.totalIncome.toLocaleString("en-IN")}`,
       ],
       [
         "Total Expense",
-        `INR ${analytics.summary.totalExpense.toLocaleString(
-          "en-IN"
-        )}`,
+        `INR ${analytics.summary.totalExpense.toLocaleString("en-IN")}`,
       ],
       [
         "Total Savings",
-        `INR ${analytics.summary.totalSavings.toLocaleString(
-          "en-IN"
-        )}`,
+        `INR ${analytics.summary.totalSavings.toLocaleString("en-IN")}`,
       ],
       [
         "Saving Rate",
@@ -76,29 +73,39 @@ function Analytics() {
     );
   };
 
-  // Export Excel
-
   const handleExportCSV = () => {
-  exportToCSV(
-    [
-      {
-        "Total Income": `INR ${analytics.summary.totalIncome.toLocaleString("en-IN")}`,
-        "Total Expense": `INR ${analytics.summary.totalExpense.toLocaleString("en-IN")}`,
-        "Total Savings": `INR ${analytics.summary.totalSavings.toLocaleString("en-IN")}`,
-        "Saving Rate": `${analytics.summary.savingRate}%`,
-      },
-    ],
-    "analytics-report"
-  );
-};
+    exportToCSV(
+      [
+        {
+          "Total Income": `INR ${analytics.summary.totalIncome.toLocaleString("en-IN")}`,
+          "Total Expense": `INR ${analytics.summary.totalExpense.toLocaleString("en-IN")}`,
+          "Total Savings": `INR ${analytics.summary.totalSavings.toLocaleString("en-IN")}`,
+          "Saving Rate": `${analytics.summary.savingRate}%`,
+        },
+      ],
+      "analytics-report"
+    );
+  };
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[70vh] items-center justify-center">
-          <p className="text-lg text-slate-500">
-            Loading Analytics...
-          </p>
+        <PageHeaderSkeleton />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {[1, 2, 3, 4].map((item) => (
+            <StatCardSkeleton key={item} />
+          ))}
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <ChartSkeleton />
+          <ChartSkeleton />
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <CardSkeleton />
+          <CardSkeleton />
         </div>
       </DashboardLayout>
     );
@@ -106,42 +113,31 @@ function Analytics() {
 
   return (
     <DashboardLayout>
-
       <div className="space-y-8">
-
-        {/* Header */}
-
-        <div className="flex items-center justify-between">
-
-          <div>
-
-            <h1 className="text-3xl font-bold text-slate-900">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl">
               Analytics
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-sm text-slate-500 sm:text-base">
               Financial insights and spending trends.
             </p>
-
           </div>
 
-          <ExportButtons
-            onPDF={handleExportPDF}
-            onCSV={handleExportCSV}
-          />
-
+          <div className="w-full sm:w-auto">
+            <ExportButtons
+              onPDF={handleExportPDF}
+              onCSV={handleExportCSV}
+            />
+          </div>
         </div>
-
-        {/* Summary */}
 
         <AnalyticsCards
           summary={analytics.summary}
         />
 
-        {/* Charts */}
-
-        <div className="grid gap-6 xl:grid-cols-2">
-
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <IncomeExpenseChart
             data={analytics.monthlyData}
           />
@@ -149,13 +145,9 @@ function Analytics() {
           <ExpensePieChart
             data={analytics.categoryBreakdown}
           />
-
         </div>
 
-        {/* Highest Transactions */}
-
-        <div className="grid gap-6 md:grid-cols-2">
-
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <HighestTransactionCard
             title="Highest Income"
             transaction={analytics.highestIncome}
@@ -167,11 +159,8 @@ function Analytics() {
             transaction={analytics.highestExpense}
             type="expense"
           />
-
         </div>
-
       </div>
-
     </DashboardLayout>
   );
 }

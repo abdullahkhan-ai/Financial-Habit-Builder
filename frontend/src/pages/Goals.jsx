@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Target } from "lucide-react";
 import toast from "react-hot-toast";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -6,6 +7,10 @@ import GoalCard from "../components/ui/GoalCard";
 import GoalModal from "../components/ui/GoalModal";
 import AddSavingsModal from "../components/ui/AddSavingsModal";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import EmptyState from "../components/ui/EmptyState";
+
+import PageHeaderSkeleton from "../components/ui/PageHeaderSkeleton";
+import GoalCardSkeleton from "../components/ui/GoalCardSkeleton";
 
 import {
   getGoals,
@@ -19,17 +24,11 @@ function Goals() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [showGoalModal, setShowGoalModal] =
-    useState(false);
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [showSavingsModal, setShowSavingsModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const [showSavingsModal, setShowSavingsModal] =
-    useState(false);
-
-  const [showDeleteModal, setShowDeleteModal] =
-    useState(false);
-
-  const [selectedGoal, setSelectedGoal] =
-    useState(null);
+  const [selectedGoal, setSelectedGoal] = useState(null);
 
   useEffect(() => {
     fetchGoals();
@@ -68,10 +67,7 @@ function Goals() {
 
   const handleUpdate = async (formData) => {
     try {
-      await updateGoal(
-        selectedGoal._id,
-        formData
-      );
+      await updateGoal(selectedGoal._id, formData);
 
       toast.success("Goal updated.");
 
@@ -112,10 +108,7 @@ function Goals() {
 
   const handleAddSavings = async (amount) => {
     try {
-      await addSavings(
-        selectedGoal._id,
-        amount
-      );
+      await addSavings(selectedGoal._id, amount);
 
       toast.success("Savings added.");
 
@@ -133,73 +126,75 @@ function Goals() {
 
   return (
     <DashboardLayout>
-
-      <div className="mb-8 flex items-center justify-between">
-
-        <div>
-
-          <h1 className="text-3xl font-bold">
-            Goals
-          </h1>
-
-          <p className="mt-2 text-slate-500">
-            Track your financial goals.
-          </p>
-
-        </div>
-
-        <button
-          onClick={() => {
-            setSelectedGoal(null);
-            setShowGoalModal(true);
-          }}
-          className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
-        >
-          + New Goal
-        </button>
-
-      </div>
-
       {loading ? (
+        <>
+          <PageHeaderSkeleton />
 
-        <div className="rounded-3xl bg-white p-10 text-center">
-          Loading...
-        </div>
-
-      ) : goals.length === 0 ? (
-
-        <div className="rounded-3xl bg-white p-12 text-center text-slate-500">
-          No goals created yet.
-        </div>
-
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <GoalCardSkeleton key={item} />
+            ))}
+          </div>
+        </>
       ) : (
+        <>
+          <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl">
+                Goals
+              </h1>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <p className="mt-2 max-w-xl text-sm text-slate-500 sm:text-base">
+                Set savings targets, monitor your progress, and stay motivated
+                to achieve your financial goals.
+              </p>
+            </div>
 
-          {goals.map((goal) => (
-
-            <GoalCard
-              key={goal._id}
-              goal={goal}
-              onEdit={(goal) => {
-                setSelectedGoal(goal);
+            <button
+              onClick={() => {
+                setSelectedGoal(null);
                 setShowGoalModal(true);
               }}
-              onDelete={openDeleteModal}
-              onAddSavings={(goal) => {
-                setSelectedGoal(goal);
-                setShowSavingsModal(true);
+              className="w-full rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
+            >
+              + New Goal
+            </button>
+          </div>
+
+          {goals.length === 0 ? (
+            <EmptyState
+              icon={Target}
+              title="No Goals Yet"
+              description="Create your first financial goal and start tracking your progress towards financial freedom."
+              buttonText="New Goal"
+              onButtonClick={() => {
+                setSelectedGoal(null);
+                setShowGoalModal(true);
               }}
             />
-
-          ))}
-
-        </div>
-
+          ) : (
+            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 xl:grid-cols-3">
+              {goals.map((goal) => (
+                <GoalCard
+                  key={goal._id}
+                  goal={goal}
+                  onEdit={(goal) => {
+                    setSelectedGoal(goal);
+                    setShowGoalModal(true);
+                  }}
+                  onDelete={openDeleteModal}
+                  onAddSavings={(goal) => {
+                    setSelectedGoal(goal);
+                    setShowSavingsModal(true);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {showGoalModal && (
-
         <GoalModal
           initialData={selectedGoal}
           onClose={() => {
@@ -212,11 +207,9 @@ function Goals() {
               : handleCreate
           }
         />
-
       )}
 
       {showSavingsModal && selectedGoal && (
-
         <AddSavingsModal
           goal={selectedGoal}
           onClose={() => {
@@ -225,7 +218,6 @@ function Goals() {
           }}
           onSave={handleAddSavings}
         />
-
       )}
 
       <ConfirmModal
@@ -234,14 +226,13 @@ function Goals() {
         message="Are you sure you want to delete this goal? This action cannot be undone."
         confirmText="Delete"
         cancelText="Cancel"
-        danger={true}
+        danger
         onClose={() => {
           setShowDeleteModal(false);
           setSelectedGoal(null);
         }}
         onConfirm={handleDelete}
       />
-
     </DashboardLayout>
   );
 }

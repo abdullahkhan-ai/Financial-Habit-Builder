@@ -17,35 +17,60 @@ const errorHandler = require("./middleware/errorHandler");
 
 dotenv.config();
 
+const app = express();
+
+// ================= ENV =================
+
+const PORT = process.env.PORT || 5000;
+const NODE_ENV = process.env.NODE_ENV || "development";
+
+// ================= START SERVER =================
+
 const startServer = async () => {
   try {
     await connectDB();
 
-    const app = express();
+    // ================= SECURITY =================
 
-    // ================= MIDDLEWARE =================
+    app.disable("x-powered-by");
 
-    app.use(cors());
+    app.use(
+      cors({
+        origin: true,
+        credentials: true,
+      })
+    );
 
     app.use(helmet());
 
     app.use(compression());
 
-    if (process.env.NODE_ENV === "production") {
-      app.use(morgan("combined"));
-    } else {
-      app.use(morgan("dev"));
-    }
+    // ================= LOGGER =================
 
-    app.use(express.json());
+    app.use(
+      morgan(
+        NODE_ENV === "production"
+          ? "combined"
+          : "dev"
+      )
+    );
 
-    app.use(express.urlencoded({ extended: true }));
+    // ================= BODY PARSER =================
+
+    app.use(express.json({ limit: "5mb" }));
+
+    app.use(
+      express.urlencoded({
+        extended: true,
+        limit: "5mb",
+      })
+    );
 
     // ================= RATE LIMITER =================
 
     app.use("/api", apiLimiter);
 
-    // ================= AUTH =================
+    // ================= ROUTES =================
 
     app.use(
       "/api/auth",
@@ -53,70 +78,50 @@ const startServer = async () => {
       require("./routes/authRoutes")
     );
 
-    // ================= INCOME =================
-
     app.use(
       "/api/income",
       require("./routes/incomeRoutes")
     );
-
-    // ================= EXPENSE =================
 
     app.use(
       "/api/expense",
       require("./routes/expenseRoutes")
     );
 
-    // ================= DASHBOARD =================
-
     app.use(
       "/api/dashboard",
       require("./routes/dashboardRoutes")
     );
-
-    // ================= GOALS =================
 
     app.use(
       "/api/goals",
       require("./routes/goalRoutes")
     );
 
-    // ================= ANALYTICS =================
-
     app.use(
       "/api/analytics",
       require("./routes/analyticsRoutes")
     );
-
-    // ================= HABITS =================
 
     app.use(
       "/api/habits",
       require("./routes/habitRoutes")
     );
 
-    // ================= REMINDERS =================
-
     app.use(
       "/api/reminders",
       require("./routes/reminderRoutes")
     );
-
-    // ================= PROFILE =================
 
     app.use(
       "/api/profile",
       require("./routes/profileRoutes")
     );
 
-    // ================= ADMIN =================
-
     app.use(
       "/api/admin",
       require("./routes/adminRoutes")
     );
-
-    // ================= FEEDBACK =================
 
     app.use(
       "/api/feedback",
@@ -126,38 +131,42 @@ const startServer = async () => {
     // ================= ROOT =================
 
     app.get("/", (req, res) => {
-      res.send("Financial Habit Builder Backend Running 🚀");
+      res.send(
+        "Financial Habit Builder Backend Running 🚀"
+      );
     });
 
-    // ================= HEALTH CHECK =================
+    // ================= HEALTH =================
 
     app.get("/health", (req, res) => {
       res.status(200).json({
         success: true,
         status: "OK",
+        environment: NODE_ENV,
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
       });
     });
 
-    // ================= 404 =================
+    // ================= ERROR =================
 
     app.use(notFound);
-
-    // ================= ERROR HANDLER =================
 
     app.use(errorHandler);
 
     // ================= SERVER =================
 
-    const PORT = process.env.PORT || 5000;
-
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(
+        `🚀 Server running on port ${PORT} (${NODE_ENV})`
+      );
     });
-
   } catch (error) {
-    console.error("❌ Server Startup Failed:", error.message);
+    console.error(
+      "❌ Server Startup Failed:",
+      error
+    );
+
     process.exit(1);
   }
 };

@@ -18,46 +18,39 @@ function StatCard({
   return (
     <div
       onClick={onClick}
-      className={`rounded-3xl border border-white/60 bg-white/80 p-6 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)] ${
+      className={`rounded-3xl border border-white/60 bg-white/80 p-5 shadow-[0_10px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)] sm:p-6 ${
         onClick
           ? "cursor-pointer hover:border-blue-300 active:scale-[0.98]"
           : ""
       }`}
     >
-      <div className="flex items-center justify-between">
-
-        <div>
-
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-slate-500">
             {title}
           </p>
 
-          <h2 className="mt-2 text-3xl font-bold text-slate-900">
+          <h2 className="mt-2 break-words text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">
             {value}
           </h2>
-
         </div>
 
         <div
-          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${colorClasses[color]}`}
+          className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl sm:h-14 sm:w-14 ${colorClasses[color]}`}
         >
-          <Icon size={28} />
+          <Icon size={24} className="sm:h-7 sm:w-7" />
         </div>
-
       </div>
 
       {change && (
-
-        <div className="mt-5 flex items-center gap-2 text-sm text-green-600">
-
+        <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-green-600">
           <TrendingUp size={16} />
 
-          <span>{change}</span>
-
+          <span className="break-words">
+            {change}
+          </span>
         </div>
-
       )}
-
     </div>
   );
 }

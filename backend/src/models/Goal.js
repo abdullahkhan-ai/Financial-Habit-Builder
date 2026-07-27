@@ -64,13 +64,18 @@ const goalSchema = new mongoose.Schema(
   }
 );
 
-// Automatically update goal status
-goalSchema.pre("save", function () {
-  if (this.savedAmount >= this.targetAmount) {
-    this.status = "Completed";
-  } else {
-    this.status = "Active";
-  }
+goalSchema.pre("save", function (next) {
+  this.status =
+    this.savedAmount >= this.targetAmount
+      ? "Completed"
+      : "Active";
+
+  next();
 });
+
+// Performance Indexes
+goalSchema.index({ user: 1 });
+goalSchema.index({ user: 1, status: 1 });
+goalSchema.index({ user: 1, targetDate: 1 });
 
 module.exports = mongoose.model("Goal", goalSchema);

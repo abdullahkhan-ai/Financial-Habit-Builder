@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -6,6 +6,11 @@ import StatCard from "../components/ui/StatCard";
 import WealthChart from "../components/ui/WealthChart";
 import RecentTransactions from "../components/ui/RecentTransactions";
 import FinancialHealth from "../components/ui/FinancialHealth";
+
+import StatCardSkeleton from "../components/ui/StatCardSkeleton";
+import RecentTransactionsSkeleton from "../components/ui/RecentTransactionsSkeleton";
+import CardSkeleton from "../components/ui/CardSkeleton";
+import WealthChartSkeleton from "../components/ui/WealthChartSkeleton";
 
 import {
   Wallet,
@@ -19,148 +24,166 @@ import { getDashboard } from "../services/dashboardService";
 function Dashboard() {
   const navigate = useNavigate();
 
-  const [dashboardData, setDashboardData] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
+    const loadDashboard = async () => {
+      try {
+        const data = await getDashboard();
+
+        if (mounted) {
+          setDashboardData(data);
+        }
+      } catch (error) {
+        console.error("Dashboard Error:", error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadDashboard();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const loadDashboard = async () => {
-    try {
-      const data = await getDashboard();
-      setDashboardData(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const incomeCount = useMemo(() => {
+    return (
+      dashboardData?.recentTransactions?.filter(
+        (item) => item.type === "Income"
+      ).length || 0
+    );
+  }, [dashboardData]);
+
+  const expenseCount = useMemo(() => {
+    return (
+      dashboardData?.recentTransactions?.filter(
+        (item) => item.type === "Expense"
+      ).length || 0
+    );
+  }, [dashboardData]);
 
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[70vh] items-center justify-center">
-          <p className="text-lg text-slate-500">
-            Loading Dashboard...
-          </p>
+        <div className="space-y-6 lg:space-y-8">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {[1, 2, 3, 4].map((item) => (
+              <StatCardSkeleton key={item} />
+            ))}
+          </div>
+
+          <div className="grid gap-6 xl:grid-cols-5">
+            <div className="xl:col-span-3">
+              <RecentTransactionsSkeleton />
+            </div>
+
+            <div className="xl:col-span-2">
+              <CardSkeleton />
+            </div>
+          </div>
+
+          <WealthChartSkeleton />
         </div>
       </DashboardLayout>
     );
   }
 
+  if (!dashboardData) {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[60vh] items-center justify-center px-4">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-800">
+              Unable to load dashboard
+            </h2>
+
+            <p className="mt-2 text-slate-500">
+              Please refresh the page and try again.
+            </p>
+
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700"
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const {
+    summary,
+    recentTransactions,
+    financialHealth,
+    chartData,
+  } = dashboardData;
+
   return (
     <DashboardLayout>
-
-      <div className="space-y-8">
-
-        {/* Stat Cards */}
-
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
+      <div className="space-y-6 lg:space-y-8">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Total Income"
-            value={`₹${dashboardData.summary.totalIncome.toLocaleString(
-              "en-IN"
-            )}`}
+            value={`₹${summary.totalIncome.toLocaleString("en-IN")}`}
             icon={Wallet}
             color="green"
-            change={`${dashboardData.recentTransactions.filter(
-              (item) =>
-                item.type === "Income"
-            ).length} Income Records`}
-            onClick={() =>
-              navigate("/income")
-            }
+            change={`${incomeCount} Income Records`}
+            onClick={() => navigate("/income")}
           />
 
           <StatCard
             title="Total Expenses"
-            value={`₹${dashboardData.summary.totalExpense.toLocaleString(
-              "en-IN"
-            )}`}
+            value={`₹${summary.totalExpense.toLocaleString("en-IN")}`}
             icon={Receipt}
             color="red"
-            change={`${dashboardData.recentTransactions.filter(
-              (item) =>
-                item.type === "Expense"
-            ).length} Expense Records`}
-            onClick={() =>
-              navigate("/expenses")
-            }
+            change={`${expenseCount} Expense Records`}
+            onClick={() => navigate("/expenses")}
           />
 
           <StatCard
             title="Total Savings"
-            value={`₹${dashboardData.summary.totalSavings.toLocaleString(
-              "en-IN"
-            )}`}
+            value={`₹${summary.totalSavings.toLocaleString("en-IN")}`}
             icon={PiggyBank}
             color="blue"
-            change={`${dashboardData.financialHealth.savingRate}% Saving Rate`}
-            onClick={() =>
-              navigate("/goals")
-            }
+            change={`${financialHealth.savingRate}% Saving Rate`}
+            onClick={() => navigate("/goals")}
           />
 
           <StatCard
             title="Net Worth"
-            value={`₹${dashboardData.summary.netWorth.toLocaleString(
-              "en-IN"
-            )}`}
+            value={`₹${summary.netWorth.toLocaleString("en-IN")}`}
             icon={TrendingUp}
             color="purple"
             change="View Analytics"
-            onClick={() =>
-              navigate("/analytics")
-            }
+            onClick={() => navigate("/analytics")}
           />
-
         </div>
 
-        {/* Recent Transactions + Financial Health */}
-
         <div className="grid gap-6 xl:grid-cols-5">
-
           <div className="xl:col-span-3">
-
             <RecentTransactions
-              transactions={
-                dashboardData.recentTransactions
-              }
+              transactions={recentTransactions}
             />
-
           </div>
 
           <div className="xl:col-span-2">
-
             <FinancialHealth
-              data={
-                dashboardData.financialHealth
-              }
+              data={financialHealth}
             />
-
           </div>
-
         </div>
 
-        {/* Wealth Growth */}
-
-        <div className="pt-2">
-
-          <WealthChart
-            data={
-              dashboardData.chartData
-            }
-          />
-
-        </div>
-
+        <WealthChart data={chartData} />
       </div>
-
     </DashboardLayout>
   );
 }

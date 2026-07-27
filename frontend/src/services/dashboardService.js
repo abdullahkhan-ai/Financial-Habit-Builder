@@ -1,19 +1,39 @@
 import API from "./authService";
 
 const getToken = () => {
-  const user =
-    JSON.parse(localStorage.getItem("user")) ||
-    JSON.parse(sessionStorage.getItem("user"));
+  const storedUser =
+    localStorage.getItem("user") ||
+    sessionStorage.getItem("user");
 
-  return user?.token;
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser).token;
+  } catch (error) {
+    console.error("Failed to parse stored user:", error);
+    return null;
+  }
 };
 
 export const getDashboard = async () => {
-  const response = await API.get("/dashboard", {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
-  });
+  const token = getToken();
 
-  return response.data;
+  if (!token) {
+    throw new Error("Authentication token not found.");
+  }
+
+  try {
+    const { data } = await API.get("/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Dashboard API Error:", error);
+    throw error;
+  }
 };
