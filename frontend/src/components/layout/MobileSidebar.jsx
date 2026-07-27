@@ -58,23 +58,19 @@ function MobileSidebar({
 
         {/* User */}
 
-        <div className="border-b border-slate-200 p-5">
+<div className="border-b border-slate-200 px-5 py-4">
 
-          <p className="truncate text-sm font-semibold text-slate-900">
-            {user?.name}
-          </p>
+  <p className="truncate text-lg font-semibold text-slate-900">
+    {user?.name}
+  </p>
 
-          <p className="mt-1 truncate text-xs text-slate-500">
-            {user?.email}
-          </p>
+  {user?.role === "admin" && (
+    <span className="mt-2 inline-flex rounded-full bg-blue-100 px-2 py-1 text-[11px] font-semibold text-blue-700">
+      Administrator
+    </span>
+  )}
 
-          {user?.role === "admin" && (
-            <span className="mt-3 inline-flex rounded-full bg-blue-100 px-2 py-1 text-[11px] font-semibold text-blue-700">
-              Administrator
-            </span>
-          )}
-
-        </div>
+</div>
 
         {/* Navigation */}
 
