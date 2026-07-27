@@ -56,21 +56,7 @@ function MobileSidebar({
 
         </div>
 
-        {/* User */}
-
-<div className="border-b border-slate-200 px-5 py-4">
-
-  <p className="truncate text-lg font-semibold text-slate-900">
-    {user?.name}
-  </p>
-
-  {user?.role === "admin" && (
-    <span className="mt-2 inline-flex rounded-full bg-blue-100 px-2 py-1 text-[11px] font-semibold text-blue-700">
-      Administrator
-    </span>
-  )}
-
-</div>
+        
 
         {/* Navigation */}
 
