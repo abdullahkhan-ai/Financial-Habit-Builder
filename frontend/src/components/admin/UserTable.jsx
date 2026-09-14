@@ -55,51 +55,64 @@ function UserTable({
 
           <tbody>
 
-            {users.map((user) => (
+            {users.map((user) => {
 
-              <tr
-                key={user._id}
-                className="border-t border-slate-200 hover:bg-slate-50"
-              >
+              const userId =
+                user._id ||
+                user.id ||
+                user.userId;
 
-                <td className="px-6 py-4 font-medium text-slate-800">
-                  {user.name}
-                </td>
+              return (
+                <tr
+                  key={userId}
+                  className="border-t border-slate-200 transition hover:bg-slate-50"
+                >
 
-                <td className="px-6 py-4 text-slate-600">
-                  {user.email}
-                </td>
+                  <td className="px-6 py-4 font-medium text-slate-800">
+                    {user.name}
+                  </td>
 
-                <td className="px-6 py-4 text-slate-600">
-                  {new Date(
-                    user.createdAt
-                  ).toLocaleDateString("en-IN")}
-                </td>
+                  <td className="px-6 py-4 text-slate-600">
+                    {user.email}
+                  </td>
 
-                <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-slate-600">
+                    {user.createdAt
+                      ? new Date(
+                          user.createdAt
+                        ).toLocaleDateString("en-IN")
+                      : "—"}
+                  </td>
 
-                  <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                    Active
-                  </span>
+                  <td className="px-6 py-4">
 
-                </td>
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                      Active
+                    </span>
 
-                <td className="px-6 py-4 text-center">
+                  </td>
 
-                  <button
-                    onClick={() =>
-                      onDelete(user._id)
-                    }
-                    className="rounded-xl bg-red-50 p-2 text-red-600 transition hover:bg-red-100"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <td className="px-6 py-4 text-center">
 
-                </td>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(user)}
+                      disabled={!userId}
+                      title={
+                        userId
+                          ? "Delete user"
+                          : "User ID unavailable"
+                      }
+                      className="rounded-xl bg-red-50 p-2 text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Trash2 size={18} />
+                    </button>
 
-              </tr>
+                  </td>
 
-            ))}
+                </tr>
+              );
+            })}
 
           </tbody>
 
