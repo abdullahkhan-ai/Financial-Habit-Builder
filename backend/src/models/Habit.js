@@ -59,9 +59,10 @@ const habitSchema = new mongoose.Schema(
 );
 
 // Reset completedToday automatically when a new day starts
-habitSchema.pre("save", function (next) {
+habitSchema.pre("save", function () {
   if (this.lastCompletedDate) {
     const today = new Date().toDateString();
+
     const lastCompleted = new Date(
       this.lastCompletedDate
     ).toDateString();
@@ -70,8 +71,6 @@ habitSchema.pre("save", function (next) {
       this.completedToday = false;
     }
   }
-
-  next();
 });
 
 module.exports = mongoose.model("Habit", habitSchema);
