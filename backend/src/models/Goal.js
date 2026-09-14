@@ -64,13 +64,12 @@ const goalSchema = new mongoose.Schema(
   }
 );
 
-goalSchema.pre("save", function (next) {
+// Automatically update goal status before saving
+goalSchema.pre("save", function () {
   this.status =
     this.savedAmount >= this.targetAmount
       ? "Completed"
       : "Active";
-
-  next();
 });
 
 // Performance Indexes
