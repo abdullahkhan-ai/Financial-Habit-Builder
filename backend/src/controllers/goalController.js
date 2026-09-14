@@ -18,24 +18,20 @@ const createGoal = async (req, res) => {
       });
     }
 
-    const initialSaved = Number(savedAmount) || 0;
-
     const goal = await Goal.create({
       user: req.user._id,
       title,
       targetAmount,
-      savedAmount: initialSaved,
+      savedAmount: savedAmount || 0,
       targetDate,
       category,
       notes,
-      status:
-        initialSaved >= Number(targetAmount)
-          ? "Completed"
-          : "Active",
     });
 
     res.status(201).json(goal);
   } catch (error) {
+    console.error("Create Goal Error:", error);
+
     res.status(500).json({
       message: error.message,
     });
@@ -53,6 +49,8 @@ const getGoals = async (req, res) => {
 
     res.status(200).json(goals);
   } catch (error) {
+    console.error("Get Goals Error:", error);
+
     res.status(500).json({
       message: error.message,
     });
@@ -70,7 +68,10 @@ const updateGoal = async (req, res) => {
       });
     }
 
-    if (goal.user.toString() !== req.user._id.toString()) {
+    if (
+      goal.user.toString() !==
+      req.user._id.toString()
+    ) {
       return res.status(401).json({
         message: "Not authorized.",
       });
@@ -78,15 +79,12 @@ const updateGoal = async (req, res) => {
 
     Object.assign(goal, req.body);
 
-    goal.status =
-      Number(goal.savedAmount) >= Number(goal.targetAmount)
-        ? "Completed"
-        : "Active";
-
     await goal.save();
 
     res.status(200).json(goal);
   } catch (error) {
+    console.error("Update Goal Error:", error);
+
     res.status(500).json({
       message: error.message,
     });
@@ -98,6 +96,12 @@ const addSavings = async (req, res) => {
   try {
     const { amount } = req.body;
 
+    if (!amount || Number(amount) <= 0) {
+      return res.status(400).json({
+        message: "Please enter a valid savings amount.",
+      });
+    }
+
     const goal = await Goal.findById(req.params.id);
 
     if (!goal) {
@@ -106,31 +110,25 @@ const addSavings = async (req, res) => {
       });
     }
 
-    if (goal.user.toString() !== req.user._id.toString()) {
+    if (
+      goal.user.toString() !==
+      req.user._id.toString()
+    ) {
       return res.status(401).json({
         message: "Not authorized.",
       });
     }
 
-    if (!amount || amount <= 0) {
-      return res.status(400).json({
-        message: "Invalid amount.",
-      });
-    }
-
-    goal.savedAmount += Number(amount);
-
-    if (goal.savedAmount >= goal.targetAmount) {
-      goal.savedAmount = goal.targetAmount;
-      goal.status = "Completed";
-    } else {
-      goal.status = "Active";
-    }
+    goal.savedAmount =
+      Number(goal.savedAmount || 0) +
+      Number(amount);
 
     await goal.save();
 
     res.status(200).json(goal);
   } catch (error) {
+    console.error("Add Savings Error:", error);
+
     res.status(500).json({
       message: error.message,
     });
@@ -148,7 +146,10 @@ const deleteGoal = async (req, res) => {
       });
     }
 
-    if (goal.user.toString() !== req.user._id.toString()) {
+    if (
+      goal.user.toString() !==
+      req.user._id.toString()
+    ) {
       return res.status(401).json({
         message: "Not authorized.",
       });
@@ -160,6 +161,8 @@ const deleteGoal = async (req, res) => {
       message: "Goal deleted successfully.",
     });
   } catch (error) {
+    console.error("Delete Goal Error:", error);
+
     res.status(500).json({
       message: error.message,
     });
