@@ -1,3 +1,4 @@
+
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -24,6 +25,41 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || "development";
 
+// ================= CORS CONFIGURATION =================
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://financial-habit-builder.vercel.app",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.error("CORS blocked origin:", origin);
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+
+  credentials: true,
+
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+  ],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+  ],
+};
+
 // ================= START SERVER =================
 
 const startServer = async () => {
@@ -34,12 +70,8 @@ const startServer = async () => {
 
     app.disable("x-powered-by");
 
-    app.use(
-      cors({
-        origin: true,
-        credentials: true,
-      })
-    );
+    // CORS must run before API routes and rate limiters
+    app.use(cors(corsOptions));
 
     app.use(helmet());
 
@@ -132,7 +164,7 @@ const startServer = async () => {
 
     app.get("/", (req, res) => {
       res.send(
-        "Financial Habit Builder Backend Running 🚀"
+        "Financial Habit Builder Backend Running"
       );
     });
 
@@ -158,12 +190,15 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       console.log(
-        `🚀 Server running on port ${PORT} (${NODE_ENV})`
+        `Server running on port ${PORT} (${NODE_ENV})`
       );
+
+      console.log("Allowed frontend origins:", allowedOrigins);
     });
+
   } catch (error) {
     console.error(
-      "❌ Server Startup Failed:",
+      "Server Startup Failed:",
       error
     );
 
